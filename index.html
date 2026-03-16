@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.0.7 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.0.8 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.0.7</title>
+  <title>Promo Dashboard v1.0.8</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -261,6 +261,12 @@
       font-size: 0.78rem;
       color: var(--text-muted);
       font-weight: 500;
+    }
+    .card-best-time {
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 2px;
     }
 
     .card-actions {
@@ -637,7 +643,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.0.7 — Promo Dashboard</div>
+      <div class="footer">v1.0.8 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -665,7 +671,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.0.7 — Promo Dashboard</div>
+      <div class="footer">v1.0.8 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -708,7 +714,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.0.7';
+    const VERSION = '1.0.8';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -718,6 +724,18 @@
       tiktok:    '🎵',
       instagram: '📷',
       devto:     '👩‍💻',
+      'dev.to':  '👩‍💻',
+    };
+
+    const PLATFORM_BEST_TIME = {
+      facebook:  '9h-11h ou 18h-20h',
+      reddit:    '14h-16h (8h-10h EST)',
+      twitter:   '8h-10h ou 12h-13h',
+      linkedin:  '8h-10h ou 17h-18h',
+      tiktok:    '18h-21h',
+      instagram: '11h-13h ou 19h-21h',
+      devto:     '15h-17h (9h-11h EST)',
+      'dev.to':  '15h-17h (9h-11h EST)',
     };
 
     // ============================================================
@@ -948,6 +966,7 @@
               <div class="card-platform-name">${escHtml(r.platform || '')}</div>
               <div class="card-article">${safeTitle}</div>
               <div class="card-group">📍 ${safeGroup}</div>
+              ${PLATFORM_BEST_TIME[platformKey] ? `<div class="card-best-time">🕐 ${PLATFORM_BEST_TIME[platformKey]}</div>` : ''}
             </div>
           </div>
           <div class="card-actions">

@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.7
+// Version : v1.0.8
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -562,7 +562,7 @@ function seedTestData(ss) {
       ['Reddit',   'r/nocode',                  'https://www.reddit.com/r/nocode',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Reddit',   'r/n8n',                     'https://www.reddit.com/r/n8n',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
-      ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/upload',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+      ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/@se7en.video.ai',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
       ['Dev.to',   '@se7enai',                 'https://dev.to/new',                                      'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
       ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
     ];
@@ -860,7 +860,7 @@ function resetMarketing() {
     ['Reddit',   'r/nocode',             'https://www.reddit.com/r/nocode',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
-    ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/upload',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+    ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/@se7en.video.ai',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
     ['Dev.to',   '@se7enai',            'https://dev.to/new',                                 'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
     ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
   ];
