@@ -40,6 +40,9 @@ function doGet(e) {
       case 'setup':
         result = setup();
         break;
+      case 'debug':
+        result = getDebug(date);
+        break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
     }
@@ -697,6 +700,108 @@ function resolveTemplate(template, article) {
   return template
     .replace(/\{title\}/g, article.title || '')
     .replace(/\{url\}/g,   article.url   || '');
+}
+
+// ── DEBUG — Diagnostic complet ──────────────────────────────
+
+function getDebug(dateParam) {
+  var today = dateParam || formatDate(new Date());
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  var config   = getSheetData(ss, SHEET_NAME_CONFIG);
+  var planning = getSheetData(ss, SHEET_NAME_PLANNING);
+  var articles = getSheetData(ss, SHEET_NAME_ARTICLES);
+
+  // Jour de la semaine
+  var d   = parseDate(today);
+  var dow = d ? d.getDay() : -1;
+  var dayNames = ['dim','lun','mar','mer','jeu','ven','sam'];
+
+  // Simuler shouldPostToday pour chaque config active
+  var activeConfigs = config.filter(function(c) {
+    return c.active === true || c.active === 'TRUE' || c.active === 'true';
+  });
+
+  var scheduleCheck = activeConfigs.map(function(cfg, idx) {
+    var freq = (cfg.frequency || '').toLowerCase();
+    var shouldPost = false;
+    var reason = '';
+
+    switch (freq) {
+      case 'daily':
+        shouldPost = dow >= 1 && dow <= 5;
+        reason = shouldPost ? 'daily lun-ven OK' : 'daily mais weekend';
+        break;
+      case '3x-week':
+        if (idx % 2 === 0) {
+          shouldPost = dow === 1 || dow === 3 || dow === 5;
+          reason = 'pair idx=' + idx + ' -> lun/mer/ven, dow=' + dow + ' ' + dayNames[dow];
+        } else {
+          shouldPost = dow === 2 || dow === 4 || dow === 6;
+          reason = 'impair idx=' + idx + ' -> mar/jeu/sam, dow=' + dow + ' ' + dayNames[dow];
+        }
+        break;
+      case 'weekly':
+        var weeklyDay = 1 + (idx % 5);
+        shouldPost = dow === weeklyDay;
+        reason = 'weekly jour=' + weeklyDay + '(' + dayNames[weeklyDay] + '), dow=' + dow + '(' + dayNames[dow] + ')';
+        break;
+      default:
+        reason = 'frequence inconnue: ' + freq;
+    }
+
+    return {
+      platform: cfg.platform,
+      group: cfg.group,
+      frequency: cfg.frequency,
+      configIdx: idx,
+      shouldPost: shouldPost,
+      reason: reason
+    };
+  });
+
+  // Planning du jour (toutes les lignes, pas juste pending)
+  var todayPlanning = planning.filter(function(r) { return r.date === today; });
+
+  // Planning du jour avec types de date
+  var todayPlanningDebug = todayPlanning.map(function(r) {
+    return {
+      _row: r._row,
+      date: r.date,
+      dateType: typeof r.date,
+      platform: r.platform,
+      group: r.group,
+      article: r.article,
+      status: r.status,
+      statusType: typeof r.status,
+      doneAt: r.doneAt
+    };
+  });
+
+  // Toutes les lignes Planning brutes (pour voir les dates)
+  var allPlanningDates = planning.map(function(r) {
+    return { _row: r._row, date: r.date, dateType: typeof r.date, status: r.status, statusType: typeof r.status };
+  });
+
+  return {
+    ok: true,
+    debug: true,
+    serverDate: today,
+    serverDow: dow,
+    serverDowName: dayNames[dow] || '?',
+    serverTimestamp: new Date().toISOString(),
+    configCount: config.length,
+    activeConfigCount: activeConfigs.length,
+    articlesCount: articles.length,
+    totalPlanningRows: planning.length,
+    todayPlanningRows: todayPlanning.length,
+    scheduleCheck: scheduleCheck,
+    todayPlanning: todayPlanningDebug,
+    allPlanningDates: allPlanningDates,
+    configRaw: config.map(function(c) {
+      return { _row: c._row, platform: c.platform, group: c.group, active: c.active, activeType: typeof c.active, frequency: c.frequency, type: c.type };
+    })
+  };
 }
 
 // ── AUTO-GENERATE — Cron minuit ──────────────────────────────

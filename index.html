@@ -684,6 +684,15 @@
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- DEBUG PANEL (triple-clic sur le titre) -->
+  <div id="debugPanel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.9);padding:16px;overflow:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="color:#06B6D4;font-weight:700;font-size:1rem;">DEBUG PANEL</span>
+      <button onclick="closeDebug()" style="background:#EF4444;color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600;">Fermer</button>
+    </div>
+    <pre id="debugOutput" style="color:#10B981;font-family:monospace;font-size:0.75rem;line-height:1.4;white-space:pre-wrap;word-break:break-all;"></pre>
+  </div>
+
   <!-- ===== JAVASCRIPT ===== -->
   <script>
     // ============================================================
@@ -1288,6 +1297,82 @@
       }
     });
 
+    // ============================================================
+    // DEBUG PANEL — triple-clic sur le titre pour ouvrir
+    // ============================================================
+    async function runDebug() {
+      const panel = document.getElementById('debugPanel');
+      const output = document.getElementById('debugOutput');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'block';
+      output.textContent = 'Chargement debug...';
+
+      try {
+        // Fetch debug, today, stats en parallele
+        const [debugRes, todayRes, statsRes] = await Promise.all([
+          fetch(`${API_URL}?action=debug`).then(r => r.json()),
+          fetch(`${API_URL}?action=today`).then(r => r.json()),
+          fetch(`${API_URL}?action=stats`).then(r => r.json()),
+        ]);
+
+        const log = [];
+        log.push('=== SERVER DEBUG ===');
+        log.push('Date serveur: ' + debugRes.serverDate + ' (' + debugRes.serverDowName + ', dow=' + debugRes.serverDow + ')');
+        log.push('Timestamp: ' + debugRes.serverTimestamp);
+        log.push('');
+
+        log.push('=== CONFIG (' + debugRes.configCount + ' total, ' + debugRes.activeConfigCount + ' actifs) ===');
+        (debugRes.configRaw || []).forEach(c => {
+          log.push('  row' + c._row + ' | ' + c.platform + ' / ' + c.group + ' | active=' + c.active + ' (' + c.activeType + ') | freq=' + c.frequency + ' | type=' + c.type);
+        });
+        log.push('');
+
+        log.push('=== SCHEDULE CHECK (shouldPostToday) ===');
+        (debugRes.scheduleCheck || []).forEach(s => {
+          log.push('  ' + (s.shouldPost ? 'YES' : 'NO ') + ' | ' + s.platform + ' / ' + s.group + ' | ' + s.reason);
+        });
+        log.push('');
+
+        log.push('=== PLANNING AUJOURD\'HUI (' + debugRes.todayPlanningRows + ' lignes) ===');
+        (debugRes.todayPlanning || []).forEach(p => {
+          log.push('  row' + p._row + ' | date=' + p.date + ' (' + p.dateType + ') | ' + p.platform + ' / ' + p.group + ' | article=' + p.article + ' | status=' + p.status + ' (' + p.statusType + ') | doneAt=' + p.doneAt);
+        });
+        log.push('');
+
+        log.push('=== TOUTES LES LIGNES PLANNING (' + debugRes.totalPlanningRows + ') ===');
+        (debugRes.allPlanningDates || []).forEach(p => {
+          log.push('  row' + p._row + ' | date=' + p.date + ' (' + p.dateType + ') | status=' + p.status + ' (' + p.statusType + ')');
+        });
+        log.push('');
+
+        log.push('=== API today RESPONSE ===');
+        log.push('tasks count: ' + (todayRes.tasks || []).length);
+        log.push('date: ' + todayRes.date);
+        (todayRes.tasks || []).forEach(t => {
+          log.push('  row' + t.row + ' | ' + t.platform + ' / ' + t.group + ' | article=' + t.article + ' | status=' + t.status + ' | type=' + t.type);
+        });
+        log.push('');
+
+        log.push('=== API stats RESPONSE ===');
+        log.push(JSON.stringify(statsRes, null, 2));
+        log.push('');
+
+        log.push('=== FRONTEND STATE ===');
+        log.push('state.cards: ' + state.cards.length);
+        log.push('state.done: ' + JSON.stringify([...state.done]));
+        log.push('state.skipped: ' + JSON.stringify([...state.skipped]));
+        log.push('state.serverStats: ' + JSON.stringify(state.serverStats));
+        log.push('articles count: ' + debugRes.articlesCount);
+
+        output.textContent = log.join('\n');
+      } catch (err) {
+        output.textContent = 'ERREUR DEBUG: ' + err.message + '\n\nVerifie que le code.gs avec getDebug() est deploye.';
+      }
+    }
+
+    function closeDebug() {
+      document.getElementById('debugPanel').style.display = 'none';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
@@ -1296,6 +1381,14 @@
       // Restore last generate timestamp
       const lastGen = localStorage.getItem('promo-lastGenerate');
       if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
+
+      // Triple-clic sur le titre = debug panel
+      const titleEl = document.querySelector('.header-title');
+      if (titleEl) {
+        titleEl.addEventListener('click', (e) => {
+          if (e.detail === 3) runDebug();
+        });
+      }
     });
   </script>
 </body>
