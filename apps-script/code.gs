@@ -408,21 +408,39 @@ function generatePlanning(body) {
   var articleOffset = 0;
 
   // Vérifie si une ligne Planning existe déjà pour (date, platform, group)
-  var existingKeys = {};
+  // On stocke le status + _row pour pouvoir reset les done/skipped
+  var existingRows = {};
   planning.forEach(function(r) {
     if (r.date === dateStr) {
-      existingKeys[normalizeKey(r.platform, r.group)] = true;
+      existingRows[normalizeKey(r.platform, r.group)] = { status: r.status, _row: r._row };
     }
   });
 
+  var planHeaders = getHeaders(planSheet);
+  var statusCol   = planHeaders.indexOf('status') + 1;
+  var doneAtCol   = planHeaders.indexOf('doneAt') + 1;
+
   var generated = [];
+  var reset     = [];
   var errors    = [];
 
   activeConfigs.forEach(function(cfg, idx) {
     if (!shouldPostToday(cfg.frequency, idx)) return;
 
     var key = normalizeKey(cfg.platform, cfg.group);
-    if (existingKeys[key]) return; // déjà planifié
+    var existing = existingRows[key];
+
+    if (existing) {
+      // Si deja pending → rien a faire
+      if (existing.status === 'pending') return;
+      // Si done ou skipped → reset a pending (bouton Generer = re-generer)
+      if (statusCol >= 1) {
+        planSheet.getRange(existing._row, statusCol).setValue('pending');
+        if (doneAtCol >= 1) planSheet.getRange(existing._row, doneAtCol).setValue('');
+        reset.push({ platform: cfg.platform, group: cfg.group, from: existing.status });
+      }
+      return;
+    }
 
     // Choisir l'article le moins partagé qui n'a pas déjà été posté
     // dans ce groupe (vérification anti-doublon simple via Planning)
@@ -446,7 +464,6 @@ function generatePlanning(body) {
     }
 
     // Ajouter la ligne dans Planning
-    var planHeaders = getHeaders(planSheet);
     var newRow = [];
     planHeaders.forEach(function(h) {
       switch (h) {
@@ -460,7 +477,7 @@ function generatePlanning(body) {
       }
     });
     planSheet.appendRow(newRow);
-    existingKeys[key] = true;
+    existingRows[key] = { status: 'pending', _row: planSheet.getLastRow() };
 
     generated.push({
       platform : cfg.platform,
@@ -473,8 +490,9 @@ function generatePlanning(body) {
     ok        : true,
     date      : dateStr,
     generated : generated,
+    reset     : reset,
     errors    : errors,
-    count     : generated.length
+    count     : generated.length + reset.length
   };
 }
 
