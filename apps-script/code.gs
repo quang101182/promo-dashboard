@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.5
+// Version : v1.0.6
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -562,6 +562,7 @@ function seedTestData(ss) {
       ['Reddit',   'r/nocode',                  'https://www.reddit.com/r/nocode',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Reddit',   'r/n8n',                     'https://www.reddit.com/r/n8n',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
+      ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/upload',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
       ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
     ];
     cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
@@ -616,6 +617,12 @@ function seedTestData(ss) {
       ['LinkedIn', 'best-free-automation-tools',
        'If your team is spending time on repetitive tasks, automation is the answer.\n\nBut you don\'t need expensive tools.\n\nI compared 7 free options to help you choose:\n{url}\n\nWhich tools are you using to automate workflows?',
        'A'],
+      ['TikTok', '*',
+       '{title}\n\nFull breakdown on the blog -- link in bio\n\n#nocode #automation #n8n #zapier #ai #tools #tech #buildinpublic #indiehacker',
+       'A'],
+      ['TikTok', '*',
+       'Stop paying for tools that have free alternatives.\n\n{title}\n\nLink in bio for the full article\n\n#nocode #automation #ai #tech #productivity #freelancer #buildinpublic',
+       'B'],
     ];
     txtSheet.getRange(2, 1, txtRows.length, txtRows[0].length).setValues(txtRows);
   }
@@ -849,6 +856,7 @@ function resetMarketing() {
     ['Reddit',   'r/nocode',             'https://www.reddit.com/r/nocode',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
+    ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/upload',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
     ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
   ];
   cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
@@ -905,6 +913,13 @@ function resetMarketing() {
      'A'],
     ['Twitter', '*',
      'Tested the top no-code automation tools so you do not have to.\n\nVerdict: it depends on exactly two things.\n\n{url}',
+     'B'],
+    // TikTok — 2 variantes (caption + hashtags, pas d'URL cliquable)
+    ['TikTok', '*',
+     '{title}\n\nFull breakdown on the blog -- link in bio\n\n#nocode #automation #n8n #zapier #ai #tools #tech #buildinpublic #indiehacker',
+     'A'],
+    ['TikTok', '*',
+     'Stop paying for tools that have free alternatives.\n\n{title}\n\nLink in bio for the full article\n\n#nocode #automation #ai #tech #productivity #freelancer #buildinpublic',
      'B'],
     // LinkedIn — 1 variante
     ['LinkedIn', '*',
