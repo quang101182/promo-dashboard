@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.0
+// Version : v1.0.2
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -793,6 +793,9 @@ function resetMarketing() {
   var planSheet = ss.getSheetByName(SHEET_NAME_PLANNING);
   var lastPlan = planSheet.getLastRow();
   if (lastPlan > 1) planSheet.deleteRows(2, lastPlan - 1);
+
+  // Flush pour s'assurer que deleteRows est applique avant de regenerer
+  SpreadsheetApp.flush();
 
   // Generer le planning du jour
   generatePlanning({ date: formatDate(new Date()) });

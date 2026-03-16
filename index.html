@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.0.1 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.0.2 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.0.1</title>
+  <title>Promo Dashboard v1.0.2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -635,7 +635,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.0.1 — Promo Dashboard</div>
+      <div class="footer">v1.0.2 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -661,7 +661,7 @@
       </button>
       <div id="lastGenerate" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:6px;"></div>
 
-      <div class="footer">v1.0.1 — Promo Dashboard</div>
+      <div class="footer">v1.0.2 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -694,7 +694,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.2';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -835,6 +835,7 @@
         const flat = data.today
           ? { done: data.today.done, skip: data.today.skipped, pending: data.today.pending, total: (data.today.done + data.today.skipped + data.today.pending) }
           : data;
+        state.serverStats = flat; // garder comme reference pour updateLocalStats
         updateStatsBar(flat);
       } catch (err) {
         console.error('fetchStats error:', err);
@@ -852,27 +853,50 @@
       const autoRows   = rows.filter(r => r.mode === 'auto');
       const manuelRows = rows.filter(r => r.mode !== 'auto');
 
-      renderCardList('autoCards', autoRows);
-      renderCardList('manuelCards', manuelRows);
+      renderCardList('autoCards', autoRows, autoRows.length);
+      renderCardList('manuelCards', manuelRows, manuelRows.length);
 
-      const autoRemaining   = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-      const manuelRemaining = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+      if (autoRows.length === 0) {
+        document.getElementById('autoCount').textContent = 'Aucune tâche';
+      } else {
+        const autoRemaining = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+        document.getElementById('autoCount').textContent = autoRemaining + ' restant' + (autoRemaining !== 1 ? 's' : '');
+      }
 
-      document.getElementById('autoCount').textContent   = autoRemaining + ' restant' + (autoRemaining !== 1 ? 's' : '');
-      document.getElementById('manuelCount').textContent = manuelRemaining + ' restant' + (manuelRemaining !== 1 ? 's' : '');
+      if (manuelRows.length === 0) {
+        document.getElementById('manuelCount').textContent = 'Aucune tâche';
+      } else {
+        const manuelRemaining = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+        document.getElementById('manuelCount').textContent = manuelRemaining + ' restant' + (manuelRemaining !== 1 ? 's' : '');
+      }
     }
 
-    function renderCardList(containerId, rows) {
+    function renderCardList(containerId, rows, totalFromApi) {
       const container = document.getElementById(containerId);
-      if (!rows || rows.length === 0) {
+      const pending = rows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row));
+
+      if (totalFromApi === 0) {
+        // Aucune tache prevue depuis l'API pour cette categorie
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">💤</div>
+            <div class="empty-state-title">Aucune tâche prévue</div>
+            <div class="empty-state-sub">Pas de promo planifiée dans cette catégorie aujourd'hui.</div>
+          </div>`;
+        return;
+      }
+
+      if (pending.length === 0) {
+        // Toutes les taches ont ete traitees (done ou skip)
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">🎉</div>
             <div class="empty-state-title">Tout est fait !</div>
-            <div class="empty-state-sub">Aucune promo en attente pour cette catégorie.</div>
+            <div class="empty-state-sub">Toutes les promos de cette catégorie ont été traitées.</div>
           </div>`;
         return;
       }
+
       container.innerHTML = rows.map((r, idx) => buildCardHtml(r, idx)).join('');
     }
 
@@ -1051,6 +1075,8 @@
         if (card.parentNode) card.parentNode.removeChild(card);
         updateLocalStats();
         refreshSectionCounts();
+        checkEmptyContainer('autoCards', 'auto');
+        checkEmptyContainer('manuelCards', 'manuel');
       }, 400);
 
       if (!API_URL) return;
@@ -1147,20 +1173,60 @@
     }
 
     function updateLocalStats() {
-      const total   = state.cards.length;
-      const done    = state.done.size;
-      const skipped = state.skipped.size;
-      const pending = total - done - skipped;
-      updateStatsBar({ done, skip: skipped, pending: Math.max(0, pending), total });
+      // Utiliser les stats serveur comme base pour eviter les sauts de total
+      const srv = state.serverStats || { done: 0, skip: 0, pending: 0, total: 0 };
+      const localDone = state.done.size;
+      const localSkipped = state.skipped.size;
+      updateStatsBar({
+        done: srv.done + localDone,
+        skip: srv.skip + localSkipped,
+        pending: Math.max(0, srv.pending - localDone - localSkipped),
+        total: srv.total
+      });
     }
 
     function refreshSectionCounts() {
       const autoRows   = state.cards.filter(r => r.mode === 'auto');
       const manuelRows = state.cards.filter(r => r.mode !== 'auto');
-      const autoRem    = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-      const manuelRem  = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-      document.getElementById('autoCount').textContent   = autoRem + ' restant' + (autoRem !== 1 ? 's' : '');
-      document.getElementById('manuelCount').textContent = manuelRem + ' restant' + (manuelRem !== 1 ? 's' : '');
+
+      if (autoRows.length === 0) {
+        document.getElementById('autoCount').textContent = 'Aucune tâche';
+      } else {
+        const autoRem = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+        document.getElementById('autoCount').textContent = autoRem + ' restant' + (autoRem !== 1 ? 's' : '');
+      }
+
+      if (manuelRows.length === 0) {
+        document.getElementById('manuelCount').textContent = 'Aucune tâche';
+      } else {
+        const manuelRem = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+        document.getElementById('manuelCount').textContent = manuelRem + ' restant' + (manuelRem !== 1 ? 's' : '');
+      }
+    }
+
+    function checkEmptyContainer(containerId, mode) {
+      const container = document.getElementById(containerId);
+      if (container && container.children.length === 0) {
+        const totalForMode = state.cards.filter(r =>
+          mode === 'auto' ? r.mode === 'auto' : r.mode !== 'auto'
+        ).length;
+
+        if (totalForMode === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">💤</div>
+              <div class="empty-state-title">Aucune tâche prévue</div>
+              <div class="empty-state-sub">Pas de promo planifiée dans cette catégorie aujourd'hui.</div>
+            </div>`;
+        } else {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🎉</div>
+              <div class="empty-state-title">Tout est fait !</div>
+              <div class="empty-state-sub">Toutes les promos de cette catégorie ont été traitées.</div>
+            </div>`;
+        }
+      }
     }
 
     // ============================================================
