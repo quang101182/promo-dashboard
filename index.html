@@ -849,11 +849,32 @@
         const flat = data.today
           ? { done: data.today.done, skip: data.today.skipped, pending: data.today.pending, total: (data.today.done + data.today.skipped + data.today.pending) }
           : data;
-        state.serverStats = flat; // garder comme reference pour updateLocalStats
+        state.serverStats = flat;
         updateStatsBar(flat);
+        // Si 0 cards affichees mais des taches done/skipped existent → "Tout est fait"
+        if (state.cards.length === 0 && flat.total > 0 && flat.pending === 0) {
+          updateEmptyStateAllDone();
+        }
       } catch (err) {
         console.error('fetchStats error:', err);
       }
+    }
+
+    function updateEmptyStateAllDone() {
+      ['autoCards', 'manuelCards'].forEach(id => {
+        const container = document.getElementById(id);
+        if (container && container.querySelector('.empty-state')) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🎉</div>
+              <div class="empty-state-title">Tout est fait !</div>
+              <div class="empty-state-sub">Toutes les promos du jour ont été traitées.</div>
+            </div>`;
+        }
+      });
+      // Mettre a jour les badges
+      document.getElementById('autoCount').textContent = 'Terminé';
+      document.getElementById('manuelCount').textContent = 'Terminé';
     }
 
     // ============================================================
