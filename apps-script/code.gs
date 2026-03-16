@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.4
+// Version : v1.0.5
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -561,8 +561,8 @@ function seedTestData(ss) {
       ['Facebook', 'Low code & no code',        'https://www.facebook.com/groups/lowcodenocode',          'MANUEL', true,  'weekly',   '', '3.5K membres'],
       ['Reddit',   'r/nocode',                  'https://www.reddit.com/r/nocode',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Reddit',   'r/n8n',                     'https://www.reddit.com/r/n8n',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
-      ['Twitter',  'auto-post',                 '',                                                        'AUTO',   false, 'daily',    '', 'Phase 2 — attente setup API'],
-      ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'Phase 4'],
+      ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
+      ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
     ];
     cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
   }
@@ -848,8 +848,8 @@ function resetMarketing() {
     ['Facebook', 'Low code & no code',   'https://www.facebook.com/groups/lowcodenocode',     'MANUEL', true,  'weekly',   '', '3.5K - Lundi'],
     ['Reddit',   'r/nocode',             'https://www.reddit.com/r/nocode',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
-    ['Twitter',  'auto-post',            '',                                                   'AUTO',   false, 'daily',    '', 'Phase 2 - attente setup API'],
-    ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'Phase 4'],
+    ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
+    ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
   ];
   cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
 
