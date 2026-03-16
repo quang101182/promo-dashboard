@@ -299,13 +299,15 @@
     .btn-open:hover { background: rgba(6, 182, 212, 0.25); }
 
     .btn-done {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(100, 116, 139, 0.15);
+      color: var(--text-secondary);
+      border: 1px solid rgba(100, 116, 139, 0.3);
     }
-    .btn-done:hover { background: rgba(16, 185, 129, 0.28); }
+    .btn-done:hover { background: rgba(16, 185, 129, 0.25); color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
     .btn-done.is-done {
       background: rgba(16, 185, 129, 0.35);
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.5);
       opacity: 0.7;
       cursor: default;
     }
@@ -943,7 +945,7 @@
           <div class="card-actions">
             <button class="btn btn-copy" data-action="copy" data-row="${r.row}">📋 Copier</button>
             ${url ? `<button class="btn btn-open" data-action="open" data-row="${r.row}">🔗 Ouvrir</button>` : ''}
-            <button class="${doneClass}" id="done-${r.row}" data-action="done" data-row="${r.row}" ${isDone ? 'disabled' : ''}>✅ Done</button>
+            <button class="${doneClass}" id="done-${r.row}" data-action="done" data-row="${r.row}" ${isDone ? 'disabled' : ''}>${isDone ? '✅ Fait !' : '○ Fait'}</button>
             <button class="btn btn-skip" data-action="skip" data-row="${r.row}">⏭ Skip</button>
           </div>
         </div>`;
@@ -1053,7 +1055,7 @@
       state.done.add(row);
       card.classList.add('done');
       const doneBtn = document.getElementById('done-' + row);
-      if (doneBtn) { doneBtn.classList.add('is-done'); doneBtn.disabled = true; }
+      if (doneBtn) { doneBtn.classList.add('is-done'); doneBtn.disabled = true; doneBtn.textContent = '✅ Fait !'; }
       showToast('✅ Marqué comme fait !', 'success');
       updateLocalStats();
 
