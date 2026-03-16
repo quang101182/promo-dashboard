@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.6
+// Version : v1.0.7
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -563,6 +563,7 @@ function seedTestData(ss) {
       ['Reddit',   'r/n8n',                     'https://www.reddit.com/r/n8n',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
       ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/upload',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+      ['Dev.to',   '@se7enai',                 'https://dev.to/new',                                      'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
       ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
     ];
     cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
@@ -623,6 +624,9 @@ function seedTestData(ss) {
       ['TikTok', '*',
        'Stop paying for tools that have free alternatives.\n\n{title}\n\nLink in bio for the full article\n\n#nocode #automation #ai #tech #productivity #freelancer #buildinpublic',
        'B'],
+      ['Dev.to', '*',
+       'Cross-post reminder:\n\n{title}\n\nOriginal: {url}\n\nCopy the article content to dev.to/new and set canonical_url to the original.',
+       'A'],
     ];
     txtSheet.getRange(2, 1, txtRows.length, txtRows[0].length).setValues(txtRows);
   }
@@ -857,6 +861,7 @@ function resetMarketing() {
     ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
     ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/upload',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+    ['Dev.to',   '@se7enai',            'https://dev.to/new',                                 'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
     ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
   ];
   cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
@@ -921,6 +926,10 @@ function resetMarketing() {
     ['TikTok', '*',
      'Stop paying for tools that have free alternatives.\n\n{title}\n\nLink in bio for the full article\n\n#nocode #automation #ai #tech #productivity #freelancer #buildinpublic',
      'B'],
+    // Dev.to — 1 variante (cross-post avec canonical URL)
+    ['Dev.to', '*',
+     'Cross-post reminder:\n\n{title}\n\nOriginal: {url}\n\nCopy the article content to dev.to/new and set canonical_url to the original.',
+     'A'],
     // LinkedIn — 1 variante
     ['LinkedIn', '*',
      'If your team is spending time on repetitive tasks, automation is the answer.\n\nBut you do not need expensive tools.\n\nI compared the best free options:\n{url}\n\nWhich tools are you using to automate workflows?',
