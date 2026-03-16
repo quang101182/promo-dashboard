@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<!-- Promo Dashboard v1.0.0 — Single-file HTML autonome -->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promo Dashboard v1.0.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #7C3AED;
+      --primary-light: #8B5CF6;
+      --primary-dark: #6D28D9;
+      --accent: #06B6D4;
+      --accent-light: #22D3EE;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --radius-card: 12px;
+      --radius-btn: 8px;
+      --transition: 0.2s ease;
+      --transition-slow: 0.35s ease;
+    }
+
+    /* DARK MODE (default) */
+    body.dark {
+      --bg: #0F172A;
+      --bg-card: #1E293B;
+      --text: #F1F5F9;
+      --text-secondary: #CBD5E1;
+      --text-muted: #64748B;
+      --border: #334155;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    /* LIGHT MODE */
+    body.light {
+      --bg: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --text: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --border: #E2E8F0;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition-slow), color var(--transition-slow);
+      padding-bottom: 80px;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(8px);
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .btn-icon:hover { background: var(--border); color: var(--text); }
+    .btn-icon:active { transform: scale(0.93); }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      padding: 12px 16px 0;
+      gap: 4px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-btn) var(--radius-btn) 0 0;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: var(--text-muted);
+      background: transparent;
+    }
+    .tab-btn.active {
+      color: var(--primary-light);
+      background: var(--bg);
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .tab-btn:not(.active):hover {
+      color: var(--text-secondary);
+      background: var(--border);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.22s ease;
+    }
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 768px;
+      margin: 0 auto;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 0 2px;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .section-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--primary-dark);
+      color: #fff;
+    }
+
+    .section-group {
+      margin-bottom: 28px;
+    }
+
+    /* ===== PROMO CARDS ===== */
+    .promo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-slow);
+      animation: cardFadeIn 0.3s ease backwards;
+    }
+    .promo-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+    .promo-card.done {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .promo-card.done .card-article,
+    .promo-card.done .card-group {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideOut {
+      from { opacity: 1; transform: translateX(0); max-height: 200px; margin-bottom: 10px; }
+      to   { opacity: 0; transform: translateX(60px); max-height: 0; margin-bottom: 0; padding: 0; }
+    }
+
+    .card-skip { animation: slideOut 0.38s ease forwards; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card-platform-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .card-info { flex: 1; min-width: 0; }
+
+    .card-platform-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary-light);
+      margin-bottom: 3px;
+    }
+
+    .card-article {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .card-group {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-btn);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.94); }
+
+    .btn-copy {
+      background: var(--primary-dark);
+      color: #fff;
+    }
+    .btn-copy:hover { background: var(--primary); }
+
+    .btn-open {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-light);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .btn-open:hover { background: rgba(6, 182, 212, 0.25); }
+
+    .btn-done {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .btn-done:hover { background: rgba(16, 185, 129, 0.28); }
+    .btn-done.is-done {
+      background: rgba(16, 185, 129, 0.35);
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .btn-skip {
+      background: rgba(100, 116, 139, 0.12);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-skip:hover { background: rgba(239, 68, 68, 0.12); color: var(--error); border-color: rgba(239, 68, 68, 0.3); }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+    .empty-state-sub { font-size: 0.83rem; }
+
+    /* ===== LOADING SKELETON ===== */
+    .skeleton-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .skeleton-line {
+      background: var(--border);
+      border-radius: 4px;
+      animation: shimmer 1.4s ease-in-out infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* ===== API URL BANNER ===== */
+    .api-banner {
+      margin: 16px;
+      padding: 14px 16px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-card);
+      font-size: 0.83rem;
+      color: var(--warning);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .api-banner-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ===== SETTINGS TAB ===== */
+    .settings-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
+    .settings-section-title:first-child { margin-top: 0; }
+
+    .group-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+    }
+    .group-item:hover { border-color: var(--primary-light); }
+
+    .group-item-info {}
+    .group-item-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .group-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Toggle switch */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .toggle-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 999px;
+      transition: background var(--transition);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform var(--transition);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--primary-light); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* Generate button */
+    .btn-generate {
+      width: 100%;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-card);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+    }
+    .btn-generate:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 6px 22px rgba(124, 58, 237, 0.5);
+      transform: translateY(-1px);
+    }
+    .btn-generate:active { transform: scale(0.97); }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .stat-item.done-stat { color: var(--success); }
+    .stat-item.skip-stat { color: var(--text-muted); }
+    .stat-item.pending-stat { color: var(--warning); }
+
+    .stat-num {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      padding: 9px 18px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+      animation: toastIn 0.25s ease;
+    }
+    .toast.success { border-color: rgba(16,185,129,0.5); color: var(--success); }
+    .toast.error { border-color: rgba(239,68,68,0.5); color: var(--error); }
+    .toast.warning { border-color: rgba(245,158,11,0.5); color: var(--warning); }
+    .toast.hide { animation: toastOut 0.25s ease forwards; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-8px); }
+    }
+
+    /* ===== REFRESH BUTTON ===== */
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .refresh-btn:hover { color: var(--primary-light); border-color: var(--primary-light); }
+    .refresh-btn.spinning { animation: spin 0.7s linear infinite; pointer-events: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 20px 16px 8px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== RESPONSIVE 768px+ ===== */
+    @media (min-width: 768px) {
+      .container { padding: 20px 24px; }
+      .header { padding: 16px 24px; }
+      .tabs { padding: 14px 24px 0; }
+      .api-banner { margin: 16px 24px; }
+      .card-actions { flex-wrap: nowrap; }
+      .stats-bar { justify-content: center; gap: 40px; }
+    }
+  </style>
+</head>
+<body class="dark">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-title">📣 Promo Dashboard</div>
+    <div class="header-right">
+      <button class="btn-icon" id="refreshBtn" title="Rafraîchir" onclick="refreshAll()">↻</button>
+      <button class="btn-icon" id="themeToggle" title="Changer thème" onclick="toggleTheme()">☀</button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchTab('today')" id="tab-today">Aujourd'hui</button>
+    <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">Settings</button>
+  </nav>
+
+  <!-- API BANNER (si pas d'URL configurée) -->
+  <div class="api-banner" id="apiBanner" style="display:none">
+    <span class="api-banner-icon">⚠️</span>
+    <span>API non configurée. Édite <code>API_URL</code> dans le JS pour connecter ton Apps Script.</span>
+  </div>
+
+  <!-- TAB: AUJOURD'HUI -->
+  <div class="tab-panel active" id="panel-today">
+    <div class="container">
+
+      <!-- Section AUTO -->
+      <div class="section-group">
+        <div class="section-header">
+          <span class="section-title">AUTO</span>
+          <span class="section-badge" id="autoCount">0 restants</span>
+        </div>
+        <div id="autoCards">
+          <!-- Skeleton placeholders -->
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:40%;height:12px"></div>
+            <div class="skeleton-line" style="width:75%;height:14px"></div>
+            <div class="skeleton-line" style="width:55%;height:10px"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:35%;height:12px"></div>
+            <div class="skeleton-line" style="width:80%;height:14px"></div>
+            <div class="skeleton-line" style="width:50%;height:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section MANUEL -->
+      <div class="section-group">
+        <div class="section-header">
+          <span class="section-title">MANUEL</span>
+          <span class="section-badge" id="manuelCount">0 restants</span>
+        </div>
+        <div id="manuelCards">
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:38%;height:12px"></div>
+            <div class="skeleton-line" style="width:70%;height:14px"></div>
+            <div class="skeleton-line" style="width:48%;height:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">v1.0.0 — Promo Dashboard</div>
+    </div>
+  </div>
+
+  <!-- TAB: SETTINGS -->
+  <div class="tab-panel" id="panel-settings">
+    <div class="container">
+
+      <p class="settings-section-title">Groupes de promotion</p>
+      <div id="groupsList">
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="width:60%;height:13px"></div>
+          <div class="skeleton-line" style="width:40%;height:10px"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="width:50%;height:13px"></div>
+          <div class="skeleton-line" style="width:35%;height:10px"></div>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="generateToday()">
+        <span>⚡</span>
+        <span>Générer le planning du jour</span>
+      </button>
+
+      <div class="footer">v1.0.0 — Promo Dashboard</div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item done-stat">
+      <span>✅</span>
+      <span class="stat-num" id="statDone">0</span>/<span id="statTotal">0</span>
+    </div>
+    <div class="stat-item skip-stat">
+      <span>⏭</span>
+      <span class="stat-num" id="statSkip">0</span>
+    </div>
+    <div class="stat-item pending-stat">
+      <span>⏳</span>
+      <span class="stat-num" id="statPending">0</span>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ============================================================
+    // CONFIG — Remplir l'URL du Apps Script déployé en Web App
+    // ============================================================
+    const API_URL = ''; // <-- Coller ici l'URL Apps Script
+
+    // ============================================================
+    // CONSTANTES
+    // ============================================================
+    const VERSION = '1.0.0';
+
+    const PLATFORM_ICONS = {
+      facebook:  '📘',
+      reddit:    '🟠',
+      twitter:   '🐦',
+      linkedin:  '💼',
+      tiktok:    '🎵',
+      instagram: '📷',
+      devto:     '👩‍💻',
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let state = {
+      cards: [],       // toutes les cards chargées
+      skipped: new Set(),
+      done: new Set(),
+      stats: { done: 0, skip: 0, pending: 0, total: 0 },
+    };
+
+    // ============================================================
+    // THEME
+    // ============================================================
+    function initTheme() {
+      const saved = localStorage.getItem('promo-theme') || 'dark';
+      applyTheme(saved);
+    }
+
+    function applyTheme(theme) {
+      document.body.classList.remove('dark', 'light');
+      document.body.classList.add(theme);
+      const btn = document.getElementById('themeToggle');
+      btn.textContent = theme === 'dark' ? '☀' : '🌙';
+    }
+
+    function toggleTheme() {
+      const current = document.body.classList.contains('dark') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('promo-theme', next);
+      applyTheme(next);
+    }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    function switchTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type = 'success', duration = 2000) {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.classList.add('hide');
+        setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+      }, duration);
+    }
+
+    // ============================================================
+    // API CHECK
+    // ============================================================
+    function checkApiUrl() {
+      const banner = document.getElementById('apiBanner');
+      if (!API_URL || API_URL.trim() === '') {
+        banner.style.display = 'flex';
+        return false;
+      }
+      banner.style.display = 'none';
+      return true;
+    }
+
+    // ============================================================
+    // FETCH TODAY
+    // ============================================================
+    async function fetchToday() {
+      if (!checkApiUrl()) {
+        renderMockCards();
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}?action=today`, { redirect: 'follow' });
+        const data = await res.json();
+        state.cards = data.tasks || [];
+        renderCards(state.cards);
+        fetchStats();
+      } catch (err) {
+        console.error('fetchToday error:', err);
+        showToast('Erreur chargement des cards', 'error', 3000);
+        renderErrorState('autoCards');
+        renderErrorState('manuelCards');
+      }
+    }
+
+    // ============================================================
+    // FETCH CONFIG (settings)
+    // ============================================================
+    async function fetchConfig() {
+      if (!checkApiUrl()) {
+        renderMockGroups();
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}?action=config`, { redirect: 'follow' });
+        const data = await res.json();
+        renderGroups(data.config || []);
+      } catch (err) {
+        console.error('fetchConfig error:', err);
+        showToast('Erreur chargement config', 'error', 3000);
+        renderErrorState('groupsList');
+      }
+    }
+
+    // ============================================================
+    // FETCH STATS
+    // ============================================================
+    async function fetchStats() {
+      if (!API_URL) return;
+      try {
+        const res = await fetch(`${API_URL}?action=stats`, { redirect: 'follow' });
+        const data = await res.json();
+        const flat = data.today
+          ? { done: data.today.done, skip: data.today.skipped, pending: data.today.pending, total: (data.today.done + data.today.skipped + data.today.pending) }
+          : data;
+        updateStatsBar(flat);
+      } catch (err) {
+        console.error('fetchStats error:', err);
+      }
+    }
+
+    // ============================================================
+    // RENDER CARDS
+    // ============================================================
+    function renderCards(rows) {
+      // Normalize mode from API 'type' field
+      rows.forEach(r => {
+        if (!r.mode) r.mode = (r.type || 'MANUEL').toUpperCase() === 'AUTO' ? 'auto' : 'manuel';
+      });
+      const autoRows   = rows.filter(r => r.mode === 'auto');
+      const manuelRows = rows.filter(r => r.mode !== 'auto');
+
+      renderCardList('autoCards', autoRows);
+      renderCardList('manuelCards', manuelRows);
+
+      const autoRemaining   = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+      const manuelRemaining = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+
+      document.getElementById('autoCount').textContent   = autoRemaining + ' restant' + (autoRemaining !== 1 ? 's' : '');
+      document.getElementById('manuelCount').textContent = manuelRemaining + ' restant' + (manuelRemaining !== 1 ? 's' : '');
+    }
+
+    function renderCardList(containerId, rows) {
+      const container = document.getElementById(containerId);
+      if (!rows || rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div class="empty-state-title">Tout est fait !</div>
+            <div class="empty-state-sub">Aucune promo en attente pour cette catégorie.</div>
+          </div>`;
+        return;
+      }
+      container.innerHTML = rows.map((r, idx) => buildCardHtml(r, idx)).join('');
+    }
+
+    function buildCardHtml(r, idx) {
+      const platformKey = (r.platform || '').toLowerCase();
+      const icon = PLATFORM_ICONS[platformKey] || '🔗';
+      const isDone   = state.done.has(r.row);
+      const cardClass = isDone ? 'promo-card done' : 'promo-card';
+      const doneClass = isDone ? 'btn btn-done is-done' : 'btn btn-done';
+      const delay = idx * 0.05;
+      const url = r.groupUrl || r.url || r.link || '';
+      const firstText = (r.textes && r.textes.length > 0) ? r.textes[0].resolved : '';
+      const copyTxt = firstText || r.articleTitle || r.text || r.title || r.article || '';
+      const safeTitle = escHtml(r.articleTitle || r.title || r.article || '');
+      const safeGroup = escHtml(r.group || r.groupe || '');
+      const mode = (r.type || r.mode || 'MANUEL').toUpperCase() === 'AUTO' ? 'auto' : 'manuel';
+
+      return `
+        <div class="${cardClass}" id="card-${r.row}" style="animation-delay:${delay}s">
+          <div class="card-top">
+            <div class="card-platform-icon">${icon}</div>
+            <div class="card-info">
+              <div class="card-platform-name">${escHtml(r.platform || '')}</div>
+              <div class="card-article">${safeTitle}</div>
+              <div class="card-group">📍 ${safeGroup}</div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-copy" onclick="copyText(${JSON.stringify(copyTxt)})">📋 Copier</button>
+            ${url ? `<button class="btn btn-open" onclick="window.open(${JSON.stringify(url)}, '_blank')">🔗 Ouvrir</button>` : ''}
+            <button class="${doneClass}" id="done-${r.row}" onclick="markDone(${r.row}, '${escHtml(r.platform)}', '${escHtml(r.group || r.groupe || '')}', '${escHtml(r.article || '')}')" ${isDone ? 'disabled' : ''}>✅ Done</button>
+            <button class="btn btn-skip" onclick="markSkip(${r.row})">⏭ Skip</button>
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // RENDER GROUPS (Settings)
+    // ============================================================
+    function renderGroups(groups) {
+      const container = document.getElementById('groupsList');
+      if (!groups || groups.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚙️</div>
+            <div class="empty-state-title">Aucun groupe trouvé</div>
+            <div class="empty-state-sub">Configure des groupes dans ton Apps Script.</div>
+          </div>`;
+        return;
+      }
+      container.innerHTML = groups.map(g => `
+        <div class="group-item">
+          <div class="group-item-info">
+            <div class="group-item-name">${PLATFORM_ICONS[(g.platform || '').toLowerCase()] || '🔗'} ${escHtml(g.group || g.name || g.groupe || '')}</div>
+            <div class="group-item-meta">${escHtml(g.platform || '')}${g.members ? ' · ' + g.members + ' membres' : ''}</div>
+          </div>
+          <div class="toggle-wrap">
+            <span class="toggle-label">${g.active ? 'ON' : 'OFF'}</span>
+            <label class="toggle">
+              <input type="checkbox" ${g.active ? 'checked' : ''} onchange="toggleGroup(${g._row || g.row}, this.checked, this)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>`).join('');
+    }
+
+    // ============================================================
+    // MOCK DATA (quand API_URL est vide)
+    // ============================================================
+    function renderMockCards() {
+      const mockRows = [
+        { row: 1, mode: 'auto',   platform: 'facebook',  title: '[Exemple] Comment automatiser sa promo avec Apps Script', group: 'NoCodeFlow — Automatisation', url: 'https://example.com', text: 'Article exemple #NoCode' },
+        { row: 2, mode: 'auto',   platform: 'reddit',    title: '[Exemple] 5 outils no-code pour les solopreneurs en 2024', group: 'r/nocode', url: 'https://example.com', text: 'Article exemple reddit' },
+        { row: 3, mode: 'manuel', platform: 'linkedin',  title: '[Exemple] Guide complet des outils IA pour créateurs', group: 'AI Tools & Automation', url: 'https://example.com', text: 'Article exemple linkedin' },
+        { row: 4, mode: 'manuel', platform: 'twitter',   title: '[Exemple] Thread: Les 10 meilleurs prompts pour ChatGPT', group: 'Tech Twitter FR', url: 'https://example.com', text: 'Article exemple twitter' },
+      ];
+      state.cards = mockRows;
+      renderCards(mockRows);
+      updateStatsBar({ done: 0, skip: 0, pending: mockRows.length, total: mockRows.length });
+    }
+
+    function renderMockGroups() {
+      const mockGroups = [
+        { row: 1, name: 'NoCodeFlow — Automatisation', platform: 'facebook', active: true, members: 1240 },
+        { row: 2, name: 'r/nocode', platform: 'reddit', active: true },
+        { row: 3, name: 'AI Tools & Automation', platform: 'linkedin', active: false, members: 870 },
+        { row: 4, name: 'Tech Twitter FR', platform: 'twitter', active: true },
+      ];
+      renderGroups(mockGroups);
+    }
+
+    function renderErrorState(containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Erreur de chargement</div>
+          <div class="empty-state-sub">Vérifie ton API_URL ou la connexion réseau.</div>
+        </div>`;
+    }
+
+    // ============================================================
+    // COPY TEXT
+    // ============================================================
+    function copyText(text) {
+      if (!text) { showToast('Rien à copier', 'warning'); return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast('📋 Copié !', 'success'))
+          .catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:-999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('📋 Copié !', 'success');
+      } catch {
+        showToast('Copie impossible', 'error');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // ============================================================
+    // MARK DONE
+    // ============================================================
+    async function markDone(row, platform, group, article) {
+      const card = document.getElementById('card-' + row);
+      if (!card || state.done.has(row)) return;
+
+      state.done.add(row);
+      card.classList.add('done');
+      const doneBtn = document.getElementById('done-' + row);
+      if (doneBtn) { doneBtn.classList.add('is-done'); doneBtn.disabled = true; }
+      showToast('✅ Marqué comme fait !', 'success');
+      updateLocalStats();
+
+      if (!API_URL) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'done', row, platform, group, article }),
+          redirect: 'follow',
+        });
+        fetchStats();
+      } catch (err) {
+        console.error('markDone error:', err);
+        showToast('Erreur sync done', 'error');
+      }
+    }
+
+    // ============================================================
+    // MARK SKIP
+    // ============================================================
+    async function markSkip(row) {
+      const card = document.getElementById('card-' + row);
+      if (!card || state.skipped.has(row)) return;
+
+      state.skipped.add(row);
+      card.classList.add('card-skip');
+      showToast('⏭ Passé', 'warning', 1500);
+
+      setTimeout(() => {
+        if (card.parentNode) card.parentNode.removeChild(card);
+        updateLocalStats();
+        refreshSectionCounts();
+      }, 400);
+
+      if (!API_URL) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'skip', row }),
+          redirect: 'follow',
+        });
+        fetchStats();
+      } catch (err) {
+        console.error('markSkip error:', err);
+      }
+    }
+
+    // ============================================================
+    // TOGGLE GROUP
+    // ============================================================
+    async function toggleGroup(row, active, inputEl) {
+      const label = inputEl.closest('.toggle-wrap').querySelector('.toggle-label');
+      if (label) label.textContent = active ? 'ON' : 'OFF';
+      showToast(active ? '✅ Groupe activé' : '🚫 Groupe désactivé', active ? 'success' : 'warning', 1500);
+
+      if (!API_URL) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'toggle', row, active }),
+          redirect: 'follow',
+        });
+      } catch (err) {
+        console.error('toggleGroup error:', err);
+        showToast('Erreur sync toggle', 'error');
+      }
+    }
+
+    // ============================================================
+    // GENERATE TODAY
+    // ============================================================
+    async function generateToday() {
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Génération en cours...</span>';
+
+      const today = new Date().toISOString().split('T')[0];
+
+      if (!API_URL) {
+        setTimeout(() => {
+          showToast('⚡ Planning généré (mock) !', 'success', 2500);
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡</span><span>Générer le planning du jour</span>';
+          switchTab('today');
+          renderMockCards();
+        }, 1200);
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'generate', date: today }),
+          redirect: 'follow',
+        });
+        const data = await res.json();
+        showToast('⚡ Planning généré !', 'success', 2500);
+        switchTab('today');
+        state.done.clear();
+        state.skipped.clear();
+        await fetchToday();
+      } catch (err) {
+        console.error('generateToday error:', err);
+        showToast('Erreur génération planning', 'error', 3000);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡</span><span>Générer le planning du jour</span>';
+      }
+    }
+
+    // ============================================================
+    // STATS
+    // ============================================================
+    function updateStatsBar(data) {
+      state.stats = data;
+      document.getElementById('statDone').textContent    = data.done    ?? 0;
+      document.getElementById('statTotal').textContent   = data.total   ?? 0;
+      document.getElementById('statSkip').textContent    = data.skip    ?? 0;
+      document.getElementById('statPending').textContent = data.pending ?? 0;
+    }
+
+    function updateLocalStats() {
+      const total   = state.cards.length;
+      const done    = state.done.size;
+      const skipped = state.skipped.size;
+      const pending = total - done - skipped;
+      updateStatsBar({ done, skip: skipped, pending: Math.max(0, pending), total });
+    }
+
+    function refreshSectionCounts() {
+      const autoRows   = state.cards.filter(r => r.mode === 'auto');
+      const manuelRows = state.cards.filter(r => r.mode !== 'auto');
+      const autoRem    = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+      const manuelRem  = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+      document.getElementById('autoCount').textContent   = autoRem + ' restant' + (autoRem !== 1 ? 's' : '');
+      document.getElementById('manuelCount').textContent = manuelRem + ' restant' + (manuelRem !== 1 ? 's' : '');
+    }
+
+    // ============================================================
+    // REFRESH
+    // ============================================================
+    async function refreshAll() {
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      await Promise.all([fetchToday(), fetchConfig()]);
+      setTimeout(() => btn.classList.remove('spinning'), 400);
+      showToast('🔄 Données actualisées', 'success', 1500);
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      checkApiUrl();
+      fetchToday();
+      fetchConfig();
+    });
+  </script>
+</body>
+</html>
