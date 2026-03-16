@@ -659,6 +659,7 @@
         <span>⚡</span>
         <span>Générer le planning du jour</span>
       </button>
+      <div id="lastGenerate" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:6px;"></div>
 
       <div class="footer">v1.0.1 — Promo Dashboard</div>
     </div>
@@ -1110,7 +1111,10 @@
           redirect: 'follow',
         });
         const data = await res.json();
-        showToast('⚡ Planning généré !', 'success', 2500);
+        const count = data.count || 0;
+        const msg = count > 0 ? '⚡ ' + count + ' tache(s) generee(s) !' : 'Planning deja a jour';
+        showToast(msg, count > 0 ? 'success' : 'warning', 2500);
+        updateGenerateTime(count);
         switchTab('today');
         state.done.clear();
         state.skipped.clear();
@@ -1162,6 +1166,15 @@
       document.getElementById('lastRefresh').textContent = d + ' ' + t;
     }
 
+    function updateGenerateTime(count) {
+      const now = new Date();
+      const d = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      const t = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const el = document.getElementById('lastGenerate');
+      el.textContent = 'Dernier generate : ' + d + ' ' + t + (count !== undefined ? ' (' + count + ' taches)' : '');
+      localStorage.setItem('promo-lastGenerate', el.textContent);
+    }
+
     async function refreshAll() {
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
@@ -1207,6 +1220,9 @@
       checkApiUrl();
       fetchToday().then(updateRefreshTime);
       fetchConfig();
+      // Restore last generate timestamp
+      const lastGen = localStorage.getItem('promo-lastGenerate');
+      if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
     });
   </script>
 </body>
