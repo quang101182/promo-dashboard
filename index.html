@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.0.2 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.0.3 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.0.2</title>
+  <title>Promo Dashboard v1.0.3</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -637,7 +637,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.0.2 — Promo Dashboard</div>
+      <div class="footer">v1.0.3 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -665,7 +665,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.0.2 — Promo Dashboard</div>
+      <div class="footer">v1.0.3 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -708,7 +708,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.0.2';
+    const VERSION = '1.0.3';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -802,6 +802,7 @@
         const res = await fetch(`${API_URL}?action=today`, { redirect: 'follow' });
         const data = await res.json();
         state.cards = data.tasks || [];
+        state.totalPlanned = data.totalPlanned || data.count || 0;
         // Sync state.done from API status (only keep rows that are actually done server-side)
         state.done.clear();
         state.skipped.clear();
@@ -810,6 +811,10 @@
           if (r.status === 'skipped') state.skipped.add(r.row);
         });
         renderCards(state.cards);
+        // Si des taches existent aujourd'hui mais aucune pending → tout est fait
+        if (state.cards.length === 0 && state.totalPlanned > 0) {
+          updateEmptyStateAllDone();
+        }
         fetchStats();
       } catch (err) {
         console.error('fetchToday error:', err);
@@ -1384,6 +1389,7 @@
 
         log.push('=== FRONTEND STATE ===');
         log.push('state.cards: ' + state.cards.length);
+        log.push('state.totalPlanned: ' + (state.totalPlanned || 0));
         log.push('state.done: ' + JSON.stringify([...state.done]));
         log.push('state.skipped: ' + JSON.stringify([...state.skipped]));
         log.push('state.serverStats: ' + JSON.stringify(state.serverStats));

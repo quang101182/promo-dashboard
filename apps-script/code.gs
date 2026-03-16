@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.2
+// Version : v1.0.3
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -138,10 +138,13 @@ function getToday() {
     articlesIndex[row.slug] = row;
   });
 
+  // Toutes les taches du jour (pour compter le total planifie)
+  var allToday = planning.filter(function(row) { return row.date === today; });
+
   // Tâches du jour : date = today ET status = pending
-  var tasks = planning
+  var tasks = allToday
     .filter(function(row) {
-      return row.date === today && row.status === 'pending';
+      return row.status === 'pending';
     })
     .map(function(row) {
       var cfgKey   = normalizeKey(row.platform, row.group);
@@ -186,10 +189,11 @@ function getToday() {
     });
 
   return {
-    ok    : true,
-    date  : today,
-    tasks : tasks,
-    count : tasks.length
+    ok           : true,
+    date         : today,
+    tasks        : tasks,
+    count        : tasks.length,
+    totalPlanned : allToday.length
   };
 }
 
