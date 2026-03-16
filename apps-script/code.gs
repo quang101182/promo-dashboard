@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.1.0
+// Version : v1.2.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -575,9 +575,21 @@ function seedTestData(ss) {
   if (artData.length <= 1) {
     var artRows = [
       // slug, title, url, lastShared, shareCount
-      ['best-free-automation-tools', '7 Best Free Automation Tools in 2026',           'https://nocode-flow.com/best-free-automation-tools',    '', 1],
-      ['zapier-alternatives',        '10 Best Zapier Alternatives (Free & Paid)',       'https://nocode-flow.com/zapier-alternatives',            '', 0],
-      ['n8n-vs-zapier',              'n8n vs Zapier: Which is Better in 2026?',         'https://nocode-flow.com/n8n-vs-zapier',                  '', 0],
+      ['best-free-automation-tools',         '7 Best Free Automation Tools in 2026',                                      'https://nocode-flow.com/best-free-automation-tools',         '', 0],
+      ['zapier-alternatives',                '10 Best Zapier Alternatives (Free & Paid)',                                  'https://nocode-flow.com/zapier-alternatives',                '', 0],
+      ['n8n-vs-zapier',                      'n8n vs Zapier: Which is Better in 2026?',                                    'https://nocode-flow.com/n8n-vs-zapier',                      '', 0],
+      ['make-vs-zapier-pricing',             'Make vs Zapier Pricing 2026: Complete Cost Comparison',                      'https://nocode-flow.com/make-vs-zapier-pricing',             '', 0],
+      ['n8n-gmail-automation-tutorial',      'How to Automate Gmail with n8n (Complete Step-by-Step Guide)',               'https://nocode-flow.com/n8n-gmail-automation-tutorial',      '', 0],
+      ['automate-social-media-no-code',      'How to Automate Social Media Without Writing a Single Line of Code',        'https://nocode-flow.com/automate-social-media-no-code',      '', 0],
+      ['n8n-vs-make',                        'n8n vs Make.com 2026: The Ultimate Head-to-Head Comparison',                 'https://nocode-flow.com/n8n-vs-make',                        '', 0],
+      ['n8n-telegram-bot-tutorial',          'How to Build a Telegram Bot with n8n -- No Coding Required',                 'https://nocode-flow.com/n8n-telegram-bot-tutorial',          '', 0],
+      ['automate-google-sheets-make',        'How to Automate Google Sheets with Make.com (Step-by-Step)',                 'https://nocode-flow.com/automate-google-sheets-make',        '', 0],
+      ['what-is-no-code-automation',         'What is No-Code Automation? Everything You Need to Know in 2026',            'https://nocode-flow.com/what-is-no-code-automation',         '', 0],
+      ['subtitle-translation-tools-compared','SubWhisper Pro vs VEED vs Kapwing 2026: Best AI Subtitle Translation Tool', 'https://nocode-flow.com/subtitle-translation-tools-compared','', 0],
+      ['n8n-vs-make-vs-zapier',              'n8n vs Make vs Zapier 2026: Ultimate No-Code Automation Comparison',         'https://nocode-flow.com/n8n-vs-make-vs-zapier',              '', 0],
+      ['automate-invoice-processing',        'How to Automate Invoice Processing Without Code (2026 Guide)',               'https://nocode-flow.com/automate-invoice-processing',        '', 0],
+      ['best-ai-transcription-tools',        'Best AI Transcription Tools 2026: Complete Guide for Content Creators',      'https://nocode-flow.com/best-ai-transcription-tools',        '', 0],
+      ['telegram-voice-transcription-bot',   'How to Transcribe Telegram Voice Messages Instantly with AI (Free Bot)',     'https://nocode-flow.com/telegram-voice-transcription-bot',   '', 0],
     ];
     artSheet.getRange(2, 1, artRows.length, artRows[0].length).setValues(artRows);
   }
@@ -866,21 +878,26 @@ function resetMarketing() {
   ];
   cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
 
-  // ── 2. ARTICLES : 3 existants + 7 a ecrire ──
+  // ── 2. ARTICLES : 15 articles reels de nocode-flow.com ──
   var artSheet = ss.getSheetByName(SHEET_NAME_ARTICLES);
   var lastArt = artSheet.getLastRow();
   if (lastArt > 1) artSheet.deleteRows(2, lastArt - 1);
   var artRows = [
-    ['best-free-automation-tools',   '7 Best Free Automation Tools in 2026',                    'https://nocode-flow.com/best-free-automation-tools',    '', 0],
-    ['zapier-alternatives',          '10 Best Zapier Alternatives (Free & Paid)',                'https://nocode-flow.com/zapier-alternatives',            '', 0],
-    ['n8n-vs-zapier',                'n8n vs Zapier: Which is Better in 2026?',                  'https://nocode-flow.com/n8n-vs-zapier',                  '', 0],
-    ['make-vs-n8n-for-beginners',    'Make vs n8n for Beginners: Which One Should You Start With?', 'https://nocode-flow.com/make-vs-n8n-for-beginners',  '', 0],
-    ['best-n8n-workflows',           '10 Best n8n Workflows to Automate Your Business in 2026', 'https://nocode-flow.com/best-n8n-workflows',             '', 0],
-    ['airtable-automation-guide',    'Airtable Automation: The Complete Beginner Guide (2026)',  'https://nocode-flow.com/airtable-automation-guide',      '', 0],
-    ['zapier-vs-make-for-small-business', 'Zapier vs Make: Which Is Better for Small Businesses?', 'https://nocode-flow.com/zapier-vs-make-for-small-business', '', 0],
-    ['automate-lead-generation',     'How to Automate Lead Generation Without Code',            'https://nocode-flow.com/automate-lead-generation',       '', 0],
-    ['no-code-ai-agents',            'No-Code AI Agents: Build Your First AI Workflow in 2026', 'https://nocode-flow.com/no-code-ai-agents',              '', 0],
-    ['n8n-self-hosted-tutorial',     'How to Self-Host n8n for Free (Complete Setup Guide)',     'https://nocode-flow.com/n8n-self-hosted-tutorial',       '', 0],
+    ['best-free-automation-tools',         '7 Best Free Automation Tools in 2026',                                      'https://nocode-flow.com/best-free-automation-tools',         '', 0],
+    ['zapier-alternatives',                '10 Best Zapier Alternatives (Free & Paid)',                                  'https://nocode-flow.com/zapier-alternatives',                '', 0],
+    ['n8n-vs-zapier',                      'n8n vs Zapier: Which is Better in 2026?',                                    'https://nocode-flow.com/n8n-vs-zapier',                      '', 0],
+    ['make-vs-zapier-pricing',             'Make vs Zapier Pricing 2026: Complete Cost Comparison',                      'https://nocode-flow.com/make-vs-zapier-pricing',             '', 0],
+    ['n8n-gmail-automation-tutorial',      'How to Automate Gmail with n8n (Complete Step-by-Step Guide)',               'https://nocode-flow.com/n8n-gmail-automation-tutorial',      '', 0],
+    ['automate-social-media-no-code',      'How to Automate Social Media Without Writing a Single Line of Code',        'https://nocode-flow.com/automate-social-media-no-code',      '', 0],
+    ['n8n-vs-make',                        'n8n vs Make.com 2026: The Ultimate Head-to-Head Comparison',                 'https://nocode-flow.com/n8n-vs-make',                        '', 0],
+    ['n8n-telegram-bot-tutorial',          'How to Build a Telegram Bot with n8n -- No Coding Required',                 'https://nocode-flow.com/n8n-telegram-bot-tutorial',          '', 0],
+    ['automate-google-sheets-make',        'How to Automate Google Sheets with Make.com (Step-by-Step)',                 'https://nocode-flow.com/automate-google-sheets-make',        '', 0],
+    ['what-is-no-code-automation',         'What is No-Code Automation? Everything You Need to Know in 2026',            'https://nocode-flow.com/what-is-no-code-automation',         '', 0],
+    ['subtitle-translation-tools-compared','SubWhisper Pro vs VEED vs Kapwing 2026: Best AI Subtitle Translation Tool', 'https://nocode-flow.com/subtitle-translation-tools-compared','', 0],
+    ['n8n-vs-make-vs-zapier',              'n8n vs Make vs Zapier 2026: Ultimate No-Code Automation Comparison',         'https://nocode-flow.com/n8n-vs-make-vs-zapier',              '', 0],
+    ['automate-invoice-processing',        'How to Automate Invoice Processing Without Code (2026 Guide)',               'https://nocode-flow.com/automate-invoice-processing',        '', 0],
+    ['best-ai-transcription-tools',        'Best AI Transcription Tools 2026: Complete Guide for Content Creators',      'https://nocode-flow.com/best-ai-transcription-tools',        '', 0],
+    ['telegram-voice-transcription-bot',   'How to Transcribe Telegram Voice Messages Instantly with AI (Free Bot)',     'https://nocode-flow.com/telegram-voice-transcription-bot',   '', 0],
   ];
   artSheet.getRange(2, 1, artRows.length, artRows[0].length).setValues(artRows);
 
