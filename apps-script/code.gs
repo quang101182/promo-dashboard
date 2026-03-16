@@ -146,8 +146,9 @@ function getToday() {
       var article  = articlesIndex[row.article] || {};
 
       // Textes correspondants pour cette platform + article (toutes variantes)
+      // Supporte article='*' (wildcard = fonctionne avec tous les articles)
       var matchingTextes = textes.filter(function(t) {
-        return t.platform === row.platform && t.article === row.article;
+        return t.platform === row.platform && (t.article === row.article || t.article === '*');
       });
 
       // Résoudre les placeholders dans le template
@@ -704,47 +705,95 @@ function installTrigger() {
   Logger.log('Trigger installé : autoGenerate chaque jour à minuit');
 }
 
-// Reset les textes (corrige les caractères cassés) — lancer UNE FOIS
-function resetTextes() {
+// ── RESET MARKETING v2 — Strategie optimisee ───────────────────
+// Lancer UNE FOIS pour appliquer la nouvelle strategie
+function resetMarketing() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // ── 1. CONFIG : frequences optimisees (max 2-3 posts/jour) ──
+  var cfgSheet = ss.getSheetByName(SHEET_NAME_CONFIG);
+  var lastCfg = cfgSheet.getLastRow();
+  if (lastCfg > 1) cfgSheet.deleteRows(2, lastCfg - 1);
+  var cfgRows = [
+    ['Facebook', 'NO CODE APP Builder',  'https://www.facebook.com/groups/nocodeappbuilder',  'MANUEL', true,  '3x-week', '', '125K - Lun/Mer/Ven'],
+    ['Facebook', 'n8n Builders',         'https://www.facebook.com/groups/n8nbuilders',       'MANUEL', true,  '3x-week', '', '147K - Mar/Jeu/Sam'],
+    ['Facebook', 'n8n Hub',              'https://www.facebook.com/groups/n8nhub',            'MANUEL', true,  'weekly',   '', '37K - Mercredi'],
+    ['Facebook', 'AI for Everyone',      'https://www.facebook.com/groups/aiforeveryone',     'MANUEL', true,  'weekly',   '', '21K - Jeudi'],
+    ['Facebook', 'Low code & no code',   'https://www.facebook.com/groups/lowcodenocode',     'MANUEL', true,  'weekly',   '', '3.5K - Lundi'],
+    ['Reddit',   'r/nocode',             'https://www.reddit.com/r/nocode',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
+    ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
+    ['Twitter',  'auto-post',            '',                                                   'AUTO',   false, 'daily',    '', 'Phase 2 - attente setup API'],
+    ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'Phase 4'],
+  ];
+  cfgSheet.getRange(2, 1, cfgRows.length, cfgRows[0].length).setValues(cfgRows);
+
+  // ── 2. ARTICLES : 3 existants + 7 a ecrire ──
+  var artSheet = ss.getSheetByName(SHEET_NAME_ARTICLES);
+  var lastArt = artSheet.getLastRow();
+  if (lastArt > 1) artSheet.deleteRows(2, lastArt - 1);
+  var artRows = [
+    ['best-free-automation-tools',   '7 Best Free Automation Tools in 2026',                    'https://nocode-flow.com/best-free-automation-tools',    '', 0],
+    ['zapier-alternatives',          '10 Best Zapier Alternatives (Free & Paid)',                'https://nocode-flow.com/zapier-alternatives',            '', 0],
+    ['n8n-vs-zapier',                'n8n vs Zapier: Which is Better in 2026?',                  'https://nocode-flow.com/n8n-vs-zapier',                  '', 0],
+    ['make-vs-n8n-for-beginners',    'Make vs n8n for Beginners: Which One Should You Start With?', 'https://nocode-flow.com/make-vs-n8n-for-beginners',  '', 0],
+    ['best-n8n-workflows',           '10 Best n8n Workflows to Automate Your Business in 2026', 'https://nocode-flow.com/best-n8n-workflows',             '', 0],
+    ['airtable-automation-guide',    'Airtable Automation: The Complete Beginner Guide (2026)',  'https://nocode-flow.com/airtable-automation-guide',      '', 0],
+    ['zapier-vs-make-for-small-business', 'Zapier vs Make: Which Is Better for Small Businesses?', 'https://nocode-flow.com/zapier-vs-make-for-small-business', '', 0],
+    ['automate-lead-generation',     'How to Automate Lead Generation Without Code',            'https://nocode-flow.com/automate-lead-generation',       '', 0],
+    ['no-code-ai-agents',            'No-Code AI Agents: Build Your First AI Workflow in 2026', 'https://nocode-flow.com/no-code-ai-agents',              '', 0],
+    ['n8n-self-hosted-tutorial',     'How to Self-Host n8n for Free (Complete Setup Guide)',     'https://nocode-flow.com/n8n-self-hosted-tutorial',       '', 0],
+  ];
+  artSheet.getRange(2, 1, artRows.length, artRows[0].length).setValues(artRows);
+
+  // ── 3. TEXTES : 5 variantes FB + 2 Reddit + 2 Twitter + 1 LinkedIn ──
   var txtSheet = ss.getSheetByName(SHEET_NAME_TEXTES);
-  if (!txtSheet) return;
-  // Supprimer toutes les données sauf headers
-  var lastRow = txtSheet.getLastRow();
-  if (lastRow > 1) txtSheet.deleteRows(2, lastRow - 1);
-  // Re-injecter les textes propres
+  var lastTxt = txtSheet.getLastRow();
+  if (lastTxt > 1) txtSheet.deleteRows(2, lastTxt - 1);
   var txtRows = [
-    ['Facebook', 'best-free-automation-tools',
-     'What\'s the best FREE automation tool in 2026?\n\nI compared 7 tools so you don\'t have to.\n\n>> {title}\n{url}\n\nWhich one are you using?',
+    // Facebook — 5 variantes generiques (marchent avec tous les articles)
+    ['Facebook', '*',
+     'Quick question for the group - what free automation tool are you actually using day-to-day in 2026?\n\nI spent some time putting together a comparison and was surprised by a few hidden gems.\n\n{title}\n{url}\n\nWould love to hear what you are running in your own stack.',
      'A'],
-    ['Facebook', 'best-free-automation-tools',
-     'Stop paying for automation tools you don\'t need.\n\nI tested 7 free options and ranked them.\n\n>> {title}\n{url}\n\nHave you tried any of these?',
+    ['Facebook', '*',
+     'Honest take: I wasted about 3 months picking the wrong automation tool when I started.\n\nKept switching, breaking workflows, starting over. Eventually I mapped out the actual differences.\n\nWrote it up here:\n{title}\n{url}\n\nWhat tool did you start with? Would you choose the same one again?',
      'B'],
-    ['Facebook', 'zapier-alternatives',
-     'Still paying $50+/month for automation?\n\n10 alternatives that do the same thing for less (or free).\n\n>> {title}\n{url}\n\nWhich one would you switch to?',
+    ['Facebook', '*',
+     'The eternal debate never really ends does it.\n\nEvery week someone asks which tool to use. So I tried to write the most honest comparison based on actual use, not marketing pages.\n\n{title}\n{url}\n\nHas your opinion shifted compared to 12 months ago?',
+     'C'],
+    ['Facebook', '*',
+     'One thing that changed how I use automation: stop building big complex workflows first.\n\nStart with one trigger, one action, test it, then layer on top.\n\nHere is a beginner-friendly breakdown:\n{title}\n{url}\n\nAny other practical tips you always give to people just starting out?',
+     'D'],
+    ['Facebook', '*',
+     'Problem I kept running into: beautiful automation workflow in theory, completely broken in practice because the free plan limits kicked in.\n\nSpent too long figuring out which tools are actually usable without paying.\n\n{title}\n{url}\n\nAnyone else been burned by free tier limits?',
+     'E'],
+    // Reddit — 2 variantes
+    ['Reddit', '*',
+     'I have been deep-diving into no-code automation tools lately and put together a comparison that cuts through the marketing noise.\n\nTested them myself and wrote up what I found.\n\n{url}\n\nHappy to answer questions. Curious what the community is running in production.',
      'A'],
-    ['Facebook', 'zapier-alternatives',
-     'I\'ve been testing Zapier alternatives for 2 weeks.\n\nHere are the 10 best ones (some are completely free).\n\n>> {title}\n{url}\n\nDrop your thoughts below',
+    ['Reddit', '*',
+     'Not trying to sell anything here. I run a small blog on no-code automation and this is one of the pieces I put the most research into.\n\nFull write-up: {url}\n\nIf you think I got something wrong, tell me - I update articles based on feedback.',
      'B'],
-    ['Facebook', 'n8n-vs-zapier',
-     'n8n is free and self-hostable. Zapier charges per task.\n\nIs the switch worth it?\n\n>> {title}\n{url}\n\nHave you used n8n before?',
+    // Twitter — 2 variantes
+    ['Twitter', '*',
+     'Most people pick the wrong automation tool because they compare features instead of what matters at their stage.\n\nI broke it down here: {url}\n\nWhat made you pick your current tool?',
      'A'],
-    ['Reddit', 'best-free-automation-tools',
-     'I spent a week testing every free automation tool I could find.\n\nRanked them by ease of use, features, and limits.\n\nFull comparison: {url}\n\nFeel free to add your own experience in the comments.',
-     'A'],
-    ['Reddit', 'zapier-alternatives',
-     'Zapier pricing just keeps going up. Here are 10 alternatives worth considering.\n\nSome are free, some are cheaper, some are self-hosted.\n\nDetailed comparison: {url}\n\nHappy to answer questions.',
-     'A'],
-    ['Twitter', 'best-free-automation-tools',
-     '7 free automation tools compared (2026)\n\nNo paywalls, no fluff -- just the tools:\n\n{url}',
-     'A'],
-    ['Twitter', 'zapier-alternatives',
-     'Zapier alternatives that won\'t break the bank:\n\n{url}\n\n10 options compared -- free tiers, pricing, features.',
-     'A'],
-    ['LinkedIn', 'best-free-automation-tools',
-     'If your team is spending time on repetitive tasks, automation is the answer.\n\nBut you don\'t need expensive tools.\n\nI compared 7 free options to help you choose:\n{url}\n\nWhich tools are you using to automate workflows?',
+    ['Twitter', '*',
+     'Tested the top no-code automation tools so you do not have to.\n\nVerdict: it depends on exactly two things.\n\n{url}',
+     'B'],
+    // LinkedIn — 1 variante
+    ['LinkedIn', '*',
+     'If your team is spending time on repetitive tasks, automation is the answer.\n\nBut you do not need expensive tools.\n\nI compared the best free options:\n{url}\n\nWhich tools are you using to automate workflows?',
      'A'],
   ];
   txtSheet.getRange(2, 1, txtRows.length, txtRows[0].length).setValues(txtRows);
-  Logger.log('Textes reset OK');
+
+  // ── 4. PLANNING : nettoyer et regenerer ──
+  var planSheet = ss.getSheetByName(SHEET_NAME_PLANNING);
+  var lastPlan = planSheet.getLastRow();
+  if (lastPlan > 1) planSheet.deleteRows(2, lastPlan - 1);
+
+  // Generer le planning du jour
+  generatePlanning({ date: formatDate(new Date()) });
+
+  Logger.log('Reset marketing complet. Config + Articles + Textes + Planning regenere.');
 }

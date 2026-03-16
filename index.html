@@ -788,6 +788,13 @@
         const res = await fetch(`${API_URL}?action=today`, { redirect: 'follow' });
         const data = await res.json();
         state.cards = data.tasks || [];
+        // Sync state.done from API status (only keep rows that are actually done server-side)
+        state.done.clear();
+        state.skipped.clear();
+        state.cards.forEach(r => {
+          if (r.status === 'done') state.done.add(r.row);
+          if (r.status === 'skipped') state.skipped.add(r.row);
+        });
         renderCards(state.cards);
         fetchStats();
       } catch (err) {
