@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.0.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.0.1 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.0.0</title>
+  <title>Promo Dashboard v1.0.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -634,7 +634,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.0.0 — Promo Dashboard</div>
+      <div class="footer">v1.0.1 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -659,7 +659,7 @@
         <span>Générer le planning du jour</span>
       </button>
 
-      <div class="footer">v1.0.0 — Promo Dashboard</div>
+      <div class="footer">v1.0.1 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -881,8 +881,12 @@
       const safeGroup = escHtml(r.group || r.groupe || '');
       const mode = (r.type || r.mode || 'MANUEL').toUpperCase() === 'AUTO' ? 'auto' : 'manuel';
 
+      // Store copy text in global map to avoid inline escaping issues
+      window._cardData = window._cardData || {};
+      window._cardData[r.row] = { copyTxt, url, platform: r.platform, group: r.group || r.groupe || '', article: r.article || '' };
+
       return `
-        <div class="${cardClass}" id="card-${r.row}" style="animation-delay:${delay}s">
+        <div class="${cardClass}" id="card-${r.row}" data-row="${r.row}" style="animation-delay:${delay}s">
           <div class="card-top">
             <div class="card-platform-icon">${icon}</div>
             <div class="card-info">
@@ -892,10 +896,10 @@
             </div>
           </div>
           <div class="card-actions">
-            <button class="btn btn-copy" onclick="copyText(${JSON.stringify(copyTxt)})">📋 Copier</button>
-            ${url ? `<button class="btn btn-open" onclick="window.open(${JSON.stringify(url)}, '_blank')">🔗 Ouvrir</button>` : ''}
-            <button class="${doneClass}" id="done-${r.row}" onclick="markDone(${r.row}, '${escHtml(r.platform)}', '${escHtml(r.group || r.groupe || '')}', '${escHtml(r.article || '')}')" ${isDone ? 'disabled' : ''}>✅ Done</button>
-            <button class="btn btn-skip" onclick="markSkip(${r.row})">⏭ Skip</button>
+            <button class="btn btn-copy" data-action="copy" data-row="${r.row}">📋 Copier</button>
+            ${url ? `<button class="btn btn-open" data-action="open" data-row="${r.row}">🔗 Ouvrir</button>` : ''}
+            <button class="${doneClass}" id="done-${r.row}" data-action="done" data-row="${r.row}" ${isDone ? 'disabled' : ''}>✅ Done</button>
+            <button class="btn btn-skip" data-action="skip" data-row="${r.row}">⏭ Skip</button>
           </div>
         </div>`;
     }
@@ -1174,6 +1178,21 @@
     // ============================================================
     // INIT
     // ============================================================
+    // Event delegation for card buttons
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const row = parseInt(btn.dataset.row, 10);
+      const d = (window._cardData || {})[row] || {};
+      switch (action) {
+        case 'copy':  copyText(d.copyTxt || ''); break;
+        case 'open':  if (d.url) window.open(d.url, '_blank'); break;
+        case 'done':  markDone(row, d.platform || '', d.group || '', d.article || ''); break;
+        case 'skip':  markSkip(row); break;
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
