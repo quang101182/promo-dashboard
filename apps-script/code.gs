@@ -381,14 +381,19 @@ function generatePlanning(body) {
   });
 
   // Vérifier si une entrée est à planifier ce jour selon sa fréquence
-  function shouldPostToday(frequency) {
+  // Utilise l'index du groupe (configIdx) pour répartir les weekly sur différents jours
+  function shouldPostToday(frequency, configIdx) {
     switch ((frequency || '').toLowerCase()) {
       case 'daily':
         return dow >= 1 && dow <= 5; // lun-ven
       case '3x-week':
-        return dow === 1 || dow === 3 || dow === 5; // lun, mer, ven
+        // Groupe pair: lun/mer/ven, groupe impair: mar/jeu/sam
+        if (configIdx % 2 === 0) return dow === 1 || dow === 3 || dow === 5;
+        else return dow === 2 || dow === 4 || dow === 6;
       case 'weekly':
-        return dow === 1; // lundi seulement
+        // Répartir les weekly sur différents jours (lun, mar, mer...)
+        var weeklyDay = 1 + (configIdx % 5); // 1=lun, 2=mar, 3=mer, 4=jeu, 5=ven
+        return dow === weeklyDay;
       default:
         return false;
     }
@@ -398,6 +403,9 @@ function generatePlanning(body) {
   var sortedArticles = articles.slice().sort(function(a, b) {
     return (parseInt(a.shareCount, 10) || 0) - (parseInt(b.shareCount, 10) || 0);
   });
+
+  // Compteur pour varier l'article choisi par groupe
+  var articleOffset = 0;
 
   // Vérifie si une ligne Planning existe déjà pour (date, platform, group)
   var existingKeys = {};
@@ -411,7 +419,7 @@ function generatePlanning(body) {
   var errors    = [];
 
   activeConfigs.forEach(function(cfg, idx) {
-    if (!shouldPostToday(cfg.frequency)) return;
+    if (!shouldPostToday(cfg.frequency, idx)) return;
 
     var key = normalizeKey(cfg.platform, cfg.group);
     if (existingKeys[key]) return; // déjà planifié
@@ -425,18 +433,12 @@ function generatePlanning(body) {
       }
     });
 
-    var chosenArticle = null;
-    for (var i = 0; i < sortedArticles.length; i++) {
-      if (!postedSlugs[sortedArticles[i].slug]) {
-        chosenArticle = sortedArticles[i];
-        break;
-      }
-    }
-
-    if (!chosenArticle) {
-      // Tous les articles ont été postés → reprendre le moins récent
-      chosenArticle = sortedArticles[0] || null;
-    }
+    // Choisir un article different par groupe (offset par idx)
+    var candidates = sortedArticles.filter(function(a) { return !postedSlugs[a.slug]; });
+    if (candidates.length === 0) candidates = sortedArticles.slice(); // cycle
+    var chosenArticle = candidates.length > 0
+      ? candidates[(articleOffset++) % candidates.length]
+      : null;
 
     if (!chosenArticle) {
       errors.push('Aucun article disponible pour ' + cfg.platform + ' / ' + cfg.group);
