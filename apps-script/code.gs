@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.0.8
+// Version : v1.0.9
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -554,13 +554,13 @@ function seedTestData(ss) {
   if (cfgData.length <= 1) { // uniquement headers ou vide
     var cfgRows = [
       // platform, group, url, type, active, frequency, lastPosted, notes
-      ['Facebook', 'NO CODE APP Builder',       'https://www.facebook.com/groups/nocodeappbuilder',       'MANUEL', true,  'daily',    '', '125K membres'],
-      ['Facebook', 'n8n Builders',              'https://www.facebook.com/groups/n8nbuilders',            'MANUEL', true,  'daily',    '', '147K membres'],
-      ['Facebook', 'n8n Hub',                   'https://www.facebook.com/groups/n8nhub',                 'MANUEL', true,  '3x-week',  '', '37K membres'],
-      ['Facebook', 'AI for Everyone',           'https://www.facebook.com/groups/aiforeveryone',          'MANUEL', true,  '3x-week',  '', '21K membres'],
-      ['Facebook', 'Low code & no code',        'https://www.facebook.com/groups/lowcodenocode',          'MANUEL', true,  'weekly',   '', '3.5K membres'],
-      ['Reddit',   'r/nocode',                  'https://www.reddit.com/r/nocode',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
-      ['Reddit',   'r/n8n',                     'https://www.reddit.com/r/n8n',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
+      ['Facebook', 'NO CODE APP Builder',       'https://www.facebook.com/groups',       'MANUEL', true,  'daily',    '', '125K membres'],
+      ['Facebook', 'n8n Builders',              'https://www.facebook.com/groups',            'MANUEL', true,  'daily',    '', '147K membres'],
+      ['Facebook', 'n8n Hub',                   'https://www.facebook.com/groups',                 'MANUEL', true,  '3x-week',  '', '37K membres'],
+      ['Facebook', 'AI for Everyone',           'https://www.facebook.com/groups',          'MANUEL', true,  '3x-week',  '', '21K membres'],
+      ['Facebook', 'Low code & no code',        'https://www.facebook.com/groups',          'MANUEL', true,  'weekly',   '', '3.5K membres'],
+      ['Reddit',   'r/nocode',                  'https://www.reddit.com',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
+      ['Reddit',   'r/n8n',                     'https://www.reddit.com',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
       ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/@se7en.video.ai',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
       ['Dev.to',   '@se7enai',                 'https://dev.to/new',                                      'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
@@ -852,13 +852,13 @@ function resetMarketing() {
   var lastCfg = cfgSheet.getLastRow();
   if (lastCfg > 1) cfgSheet.deleteRows(2, lastCfg - 1);
   var cfgRows = [
-    ['Facebook', 'NO CODE APP Builder',  'https://www.facebook.com/groups/nocodeappbuilder',  'MANUEL', true,  '3x-week', '', '125K - Lun/Mer/Ven'],
-    ['Facebook', 'n8n Builders',         'https://www.facebook.com/groups/n8nbuilders',       'MANUEL', true,  '3x-week', '', '147K - Mar/Jeu/Sam'],
-    ['Facebook', 'n8n Hub',              'https://www.facebook.com/groups/n8nhub',            'MANUEL', true,  'weekly',   '', '37K - Mercredi'],
-    ['Facebook', 'AI for Everyone',      'https://www.facebook.com/groups/aiforeveryone',     'MANUEL', true,  'weekly',   '', '21K - Jeudi'],
-    ['Facebook', 'Low code & no code',   'https://www.facebook.com/groups/lowcodenocode',     'MANUEL', true,  'weekly',   '', '3.5K - Lundi'],
-    ['Reddit',   'r/nocode',             'https://www.reddit.com/r/nocode',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
-    ['Reddit',   'r/n8n',                'https://www.reddit.com/r/n8n',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
+    ['Facebook', 'NO CODE APP Builder',  'https://www.facebook.com/groups',  'MANUEL', true,  '3x-week', '', '125K - Lun/Mer/Ven'],
+    ['Facebook', 'n8n Builders',         'https://www.facebook.com/groups',       'MANUEL', true,  '3x-week', '', '147K - Mar/Jeu/Sam'],
+    ['Facebook', 'n8n Hub',              'https://www.facebook.com/groups',            'MANUEL', true,  'weekly',   '', '37K - Mercredi'],
+    ['Facebook', 'AI for Everyone',      'https://www.facebook.com/groups',     'MANUEL', true,  'weekly',   '', '21K - Jeudi'],
+    ['Facebook', 'Low code & no code',   'https://www.facebook.com/groups',     'MANUEL', true,  'weekly',   '', '3.5K - Lundi'],
+    ['Reddit',   'r/nocode',             'https://www.reddit.com',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
+    ['Reddit',   'r/n8n',                'https://www.reddit.com',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  '3x-week',  '', 'Se7en Vision AI'],
     ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/@se7en.video.ai',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
     ['Dev.to',   '@se7enai',            'https://dev.to/new',                                 'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
