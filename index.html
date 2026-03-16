@@ -577,6 +577,7 @@
   <header class="header">
     <div class="header-title">📣 Promo Dashboard</div>
     <div class="header-right">
+      <span id="lastRefresh" style="font-size:0.7rem;color:var(--text-muted);margin-right:8px;"></span>
       <button class="btn-icon" id="refreshBtn" title="Rafraîchir" onclick="refreshAll()">↻</button>
       <button class="btn-icon" id="themeToggle" title="Changer thème" onclick="toggleTheme()">☀</button>
     </div>
@@ -1154,10 +1155,18 @@
     // ============================================================
     // REFRESH
     // ============================================================
+    function updateRefreshTime() {
+      const now = new Date();
+      const d = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      const t = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('lastRefresh').textContent = d + ' ' + t;
+    }
+
     async function refreshAll() {
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
       await Promise.all([fetchToday(), fetchConfig()]);
+      updateRefreshTime();
       setTimeout(() => btn.classList.remove('spinning'), 400);
       showToast('🔄 Données actualisées', 'success', 1500);
     }
@@ -1196,7 +1205,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
-      fetchToday();
+      fetchToday().then(updateRefreshTime);
       fetchConfig();
     });
   </script>
