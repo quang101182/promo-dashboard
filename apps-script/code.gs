@@ -562,19 +562,19 @@ function seedTestData(ss) {
     var txtRows = [
       // platform, article, template, variant
       ['Facebook', 'best-free-automation-tools',
-       'What\'s the best FREE automation tool in 2026?\n\nI compared 7 tools so you don\'t have to.\n\n→ {title}\n{url}\n\nWhich one are you using?',
+       'What\'s the best FREE automation tool in 2026?\n\nI compared 7 tools so you don\'t have to.\n\n>> {title}\n{url}\n\nWhich one are you using?',
        'A'],
       ['Facebook', 'best-free-automation-tools',
-       'Stop paying for automation tools you don\'t need.\n\nI tested 7 free options and ranked them.\n\n→ {title}\n{url}\n\nHave you tried any of these?',
+       'Stop paying for automation tools you don\'t need.\n\nI tested 7 free options and ranked them.\n\n>> {title}\n{url}\n\nHave you tried any of these?',
        'B'],
       ['Facebook', 'zapier-alternatives',
-       'Still paying $50+/month for automation?\n\n10 alternatives that do the same thing for less (or free).\n\n→ {title}\n{url}\n\nWhich one would you switch to?',
+       'Still paying $50+/month for automation?\n\n10 alternatives that do the same thing for less (or free).\n\n>> {title}\n{url}\n\nWhich one would you switch to?',
        'A'],
       ['Facebook', 'zapier-alternatives',
-       'I\'ve been testing Zapier alternatives for 2 weeks.\n\nHere are the 10 best ones (some are completely free).\n\n→ {title}\n{url}\n\nDrop your thoughts below 👇',
+       'I\'ve been testing Zapier alternatives for 2 weeks.\n\nHere are the 10 best ones (some are completely free).\n\n>> {title}\n{url}\n\nDrop your thoughts below',
        'B'],
       ['Facebook', 'n8n-vs-zapier',
-       'n8n is free and self-hostable. Zapier charges per task.\n\nIs the switch worth it?\n\n→ {title}\n{url}\n\nHave you used n8n before?',
+       'n8n is free and self-hostable. Zapier charges per task.\n\nIs the switch worth it?\n\n>> {title}\n{url}\n\nHave you used n8n before?',
        'A'],
       ['Reddit', 'best-free-automation-tools',
        'I spent a week testing every free automation tool I could find.\n\nRanked them by ease of use, features, and limits.\n\nFull comparison: {url}\n\nFeel free to add your own experience in the comments.',
@@ -676,4 +676,75 @@ function resolveTemplate(template, article) {
   return template
     .replace(/\{title\}/g, article.title || '')
     .replace(/\{url\}/g,   article.url   || '');
+}
+
+// ── AUTO-GENERATE — Cron minuit ──────────────────────────────
+// Appelé automatiquement par le trigger installé via installTrigger()
+
+function autoGenerate() {
+  var result = generatePlanning({ date: formatDate(new Date()) });
+  Logger.log('Auto-generate: ' + JSON.stringify(result));
+}
+
+// Installe le trigger quotidien à minuit (à lancer UNE SEULE FOIS manuellement)
+function installTrigger() {
+  // Supprimer les anciens triggers autoGenerate pour éviter les doublons
+  var triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(function(t) {
+    if (t.getHandlerFunction() === 'autoGenerate') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+  // Créer le nouveau trigger : chaque jour entre 00:00 et 01:00
+  ScriptApp.newTrigger('autoGenerate')
+    .timeBased()
+    .everyDays(1)
+    .atHour(0)
+    .create();
+  Logger.log('Trigger installé : autoGenerate chaque jour à minuit');
+}
+
+// Reset les textes (corrige les caractères cassés) — lancer UNE FOIS
+function resetTextes() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var txtSheet = ss.getSheetByName(SHEET_NAME_TEXTES);
+  if (!txtSheet) return;
+  // Supprimer toutes les données sauf headers
+  var lastRow = txtSheet.getLastRow();
+  if (lastRow > 1) txtSheet.deleteRows(2, lastRow - 1);
+  // Re-injecter les textes propres
+  var txtRows = [
+    ['Facebook', 'best-free-automation-tools',
+     'What\'s the best FREE automation tool in 2026?\n\nI compared 7 tools so you don\'t have to.\n\n>> {title}\n{url}\n\nWhich one are you using?',
+     'A'],
+    ['Facebook', 'best-free-automation-tools',
+     'Stop paying for automation tools you don\'t need.\n\nI tested 7 free options and ranked them.\n\n>> {title}\n{url}\n\nHave you tried any of these?',
+     'B'],
+    ['Facebook', 'zapier-alternatives',
+     'Still paying $50+/month for automation?\n\n10 alternatives that do the same thing for less (or free).\n\n>> {title}\n{url}\n\nWhich one would you switch to?',
+     'A'],
+    ['Facebook', 'zapier-alternatives',
+     'I\'ve been testing Zapier alternatives for 2 weeks.\n\nHere are the 10 best ones (some are completely free).\n\n>> {title}\n{url}\n\nDrop your thoughts below',
+     'B'],
+    ['Facebook', 'n8n-vs-zapier',
+     'n8n is free and self-hostable. Zapier charges per task.\n\nIs the switch worth it?\n\n>> {title}\n{url}\n\nHave you used n8n before?',
+     'A'],
+    ['Reddit', 'best-free-automation-tools',
+     'I spent a week testing every free automation tool I could find.\n\nRanked them by ease of use, features, and limits.\n\nFull comparison: {url}\n\nFeel free to add your own experience in the comments.',
+     'A'],
+    ['Reddit', 'zapier-alternatives',
+     'Zapier pricing just keeps going up. Here are 10 alternatives worth considering.\n\nSome are free, some are cheaper, some are self-hosted.\n\nDetailed comparison: {url}\n\nHappy to answer questions.',
+     'A'],
+    ['Twitter', 'best-free-automation-tools',
+     '7 free automation tools compared (2026)\n\nNo paywalls, no fluff -- just the tools:\n\n{url}',
+     'A'],
+    ['Twitter', 'zapier-alternatives',
+     'Zapier alternatives that won\'t break the bank:\n\n{url}\n\n10 options compared -- free tiers, pricing, features.',
+     'A'],
+    ['LinkedIn', 'best-free-automation-tools',
+     'If your team is spending time on repetitive tasks, automation is the answer.\n\nBut you don\'t need expensive tools.\n\nI compared 7 free options to help you choose:\n{url}\n\nWhich tools are you using to automate workflows?',
+     'A'],
+  ];
+  txtSheet.getRange(2, 1, txtRows.length, txtRows[0].length).setValues(txtRows);
+  Logger.log('Textes reset OK');
 }
