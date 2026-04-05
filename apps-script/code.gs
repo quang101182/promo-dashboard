@@ -51,6 +51,9 @@ function doGet(e) {
       case 'todayVideos':
         result = getTodayVideos();
         break;
+      case 'allVideos':
+        result = getAllVideos();
+        break;
       case 'strategy':
         result = getStrategy();
         break;
@@ -1058,6 +1061,13 @@ function getWeekISO(dateStr) {
   var week1 = new Date(d.getFullYear(), 0, 4);
   var weekNum = 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
   return d.getFullYear() + '-W' + (weekNum < 10 ? '0' : '') + weekNum;
+}
+
+// ── GET : allVideos ──────────────────────────────────────────
+
+function getAllVideos() {
+  var contenu = sheetToObjects(SHEET_NAME_CONTENU);
+  return { ok: true, videos: contenu, count: contenu.length };
 }
 
 // ── GET : todayVideos ────────────────────────────────────────
