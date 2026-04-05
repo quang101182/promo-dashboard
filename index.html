@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.3.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.3.1 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.3.0</title>
+  <title>Promo Dashboard v1.3.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -664,18 +664,19 @@
     .video-cmd {
       font-family: 'Courier New', Courier, monospace;
       font-size: 0.75rem;
-      background: rgba(0,0,0,0.35);
+      background: var(--bg);
       color: var(--accent-light);
-      padding: 6px 10px;
+      padding: 10px 12px;
       border-radius: 6px;
       margin-bottom: 8px;
       cursor: pointer;
-      word-break: break-all;
+      overflow-wrap: break-word;
+      word-break: break-word;
       line-height: 1.4;
       transition: background var(--transition);
       border: 1px solid var(--border);
     }
-    .video-cmd:hover { background: rgba(0,0,0,0.5); }
+    .video-cmd:hover { background: var(--border); }
 
     .video-actions {
       display: flex;
@@ -945,7 +946,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.3.0 — Promo Dashboard</div>
+      <div class="footer">v1.3.1 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -998,7 +999,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.3.0 — Promo Dashboard</div>
+      <div class="footer">v1.3.1 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1086,7 +1087,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.3.0 — Promo Dashboard</div>
+      <div class="footer">v1.3.1 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1129,7 +1130,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.3.0';
+    const VERSION = '1.3.1';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1985,7 +1986,7 @@
       const statusHtml = `<span class="video-status ${statut}">${escHtml(v.statut || 'planifie')}</span>`;
 
       const cmdHtml = v.promoCmd
-        ? `<div class="video-cmd" data-action="vcmd-copy" data-vkey="${escHtml(vkey)}" title="Cliquer pour copier">${escHtml(v.promoCmd)}</div>`
+        ? `<div class="video-cmd" role="button" tabindex="0" data-action="vcmd-copy" data-vkey="${escHtml(vkey)}" title="Cliquer pour copier">${escHtml(v.promoCmd)}</div>`
         : '';
 
       const linkHtml = v.lien
@@ -2023,8 +2024,12 @@
     // ============================================================
     // UPDATE VIDEO STATUS
     // ============================================================
+    const _videoUpdated = new Set();
     async function updateVideoStatus(row, statut) {
       if (!row) { showToast('Row manquant', 'error'); return; }
+      const updateKey = row + '-' + statut;
+      if (_videoUpdated.has(updateKey)) return;
+      _videoUpdated.add(updateKey);
 
       // Optimistic UI
       const card = document.getElementById('vcard-' + row);
