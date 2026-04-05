@@ -1961,16 +1961,17 @@
     // ============================================================
     // BUILD SINGLE VIDEO CARD HTML
     // ============================================================
-    function buildVideoCardHtml(v, idx) {
+    function buildVideoCardHtml(v, idx, prefix) {
+      prefix = prefix || '';
       const platformKey = (v.plateforme || '').toLowerCase();
       const icon = PLATFORM_ICONS[platformKey] || '🎬';
-      const statut = (v.statut || 'planifie').toLowerCase().replace(/ /g, '_');
+      const statut = escHtml((v.statut || 'planifie').toLowerCase().replace(/ /g, '_'));
       const isPublie = statut === 'publie';
       const cardClass = isPublie ? 'video-card done' : 'video-card';
       const delay = idx * 0.05;
       const langClass = (v.langue || '').toUpperCase() === 'FR' ? 'video-lang-fr' : 'video-lang-en';
       const langLabel = (v.langue || 'EN').toUpperCase();
-      const vkey = (v._row || idx) + '-' + (v.plateforme || '') + '-' + idx;
+      const vkey = prefix + (v._row || idx) + '-' + (v.plateforme || '') + '-' + idx;
 
       // Store video data for event delegation
       window._videoCardData[vkey] = {
@@ -1990,7 +1991,7 @@
         : '';
 
       return `
-        <div class="${cardClass}" id="vcard-${v._row || idx}" style="animation-delay:${delay}s">
+        <div class="${cardClass}" id="vcard-${prefix}${v._row || idx}" style="animation-delay:${delay}s">
           <div class="video-top">
             <div class="video-platform-icon">${icon}</div>
             <div class="video-info">
@@ -2202,9 +2203,9 @@
       const pending = videos.filter(v => v.statut === 'planifie' || v.statut === 'en_production');
       badge.textContent = pending.length > 0 ? pending.length + ' restant' + (pending.length > 1 ? 's' : '') : 'Termine';
 
-      // Reuse the video card builder from the Videos tab
+      // Reuse the video card builder with 'today-' prefix to avoid ID collision with Stats tab
       window._videoCardData = window._videoCardData || {};
-      container.innerHTML = videos.map((v, idx) => buildVideoCardHtml(v, idx)).join('');
+      container.innerHTML = videos.map((v, idx) => buildVideoCardHtml(v, idx, 'today-')).join('');
     }
   </script>
 </body>
