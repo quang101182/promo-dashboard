@@ -1283,9 +1283,9 @@ function setupVideo() {
     for (var w = 0; w < 2; w++) {
       var base = new Date(monday); base.setDate(base.getDate() + w * 7);
       var lun = new Date(base);
-      seed.push([formatDate(lun), 'TikTok', '@se7en.video.ai', 'slide', 'DictoKey', 'AI voice keyboard - type 10x faster', 'EN', '', '', 'planifie', '', '/promo en DictoKey AI voice keyboard type 10x faster']);
+      seed.push([formatDate(lun), 'TikTok', '@se7en.video.ai', 'pip', 'DictoKey', 'AI voice keyboard - type 10x faster', 'EN', '', '', 'planifie', '', '/promo pip en DictoKey AI voice keyboard type 10x faster']);
       var mer = new Date(base); mer.setDate(mer.getDate() + 2);
-      seed.push([formatDate(mer), 'TikTok', '@se7en.news.ai', 'slide', 'DictoKey', 'Clavier vocal IA - dictee 10x plus rapide', 'FR', '', '', 'planifie', '', '/promo fr DictoKey clavier vocal IA dictee rapide']);
+      seed.push([formatDate(mer), 'TikTok', '@se7en.news.ai', 'pip', 'DictoKey', 'Clavier vocal IA - dictee 10x plus rapide', 'FR', '', '', 'planifie', '', '/promo pip fr DictoKey clavier vocal IA dictee rapide']);
       var ven = new Date(base); ven.setDate(ven.getDate() + 4);
       seed.push([formatDate(ven), 'TikTok', '@se7en.video.ai', 'slide', 'NoCodeFlow', 'Automate everything without writing code', 'EN', '', '', 'planifie', '', '/promo en NoCodeFlow automate everything without code']);
     }
