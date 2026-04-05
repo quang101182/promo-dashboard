@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.4.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.5.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.4.0</title>
+  <title>Promo Dashboard v1.5.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -896,7 +896,7 @@
   <!-- TABS -->
   <nav class="tabs">
     <button class="tab-btn active" onclick="switchTab('today')" id="tab-today">Aujourd'hui</button>
-    <button class="tab-btn" onclick="switchTab('videos')" id="tab-videos">Videos</button>
+    <button class="tab-btn" onclick="switchTab('videos')" id="tab-videos">Stats</button>
     <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">Settings</button>
   </nav>
 
@@ -946,11 +946,26 @@
         </div>
       </div>
 
-      <div class="footer">v1.4.0 — Promo Dashboard</div>
+      <!-- Section VIDEOS DU JOUR -->
+      <div class="section-group" id="todayVideosSection">
+        <div class="section-header">
+          <span class="section-title">VIDEOS</span>
+          <span class="section-badge" id="videoCount">0</span>
+        </div>
+        <div id="todayVideoCards">
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:35%;height:12px"></div>
+            <div class="skeleton-line" style="width:80%;height:14px"></div>
+            <div class="skeleton-line" style="width:50%;height:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">v1.5.0 — Promo Dashboard</div>
     </div>
   </div>
 
-  <!-- TAB: VIDEOS -->
+  <!-- TAB: VIDEOS (Stats & Performance) -->
   <div class="tab-panel" id="panel-videos">
     <div class="container">
 
@@ -999,7 +1014,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.4.0 — Promo Dashboard</div>
+      <div class="footer">v1.5.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1089,7 +1104,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.4.0 — Promo Dashboard</div>
+      <div class="footer">v1.5.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1132,7 +1147,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.4.0';
+    const VERSION = '1.5.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1746,7 +1761,7 @@
     async function refreshAll() {
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
-      const promises = [fetchToday(), fetchConfig()];
+      const promises = [fetchToday(), fetchConfig(), fetchTodayVideosInline()];
       if (videoState.loaded) promises.push(fetchTodayVideos());
       await Promise.all(promises);
       updateRefreshTime();
@@ -2194,12 +2209,52 @@
       checkApiUrl();
       fetchToday().then(updateRefreshTime);
       fetchConfig();
+      fetchTodayVideosInline();
       // Restore last generate timestamp
       const lastGen = localStorage.getItem('promo-lastGenerate');
       if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
-
-      // Debug button is in Settings tab
     });
+
+    // ============================================================
+    // TODAY VIDEOS INLINE (in Aujourd'hui tab)
+    // ============================================================
+    async function fetchTodayVideosInline() {
+      if (!checkApiUrl()) return;
+      try {
+        const res = await fetch(`${API_URL}?action=todayVideos`, { redirect: 'follow' });
+        const data = await res.json();
+        const videos = data.videos || [];
+        renderTodayVideoCards(videos);
+      } catch (err) {
+        console.error('fetchTodayVideosInline error:', err);
+        document.getElementById('todayVideoCards').innerHTML = '';
+        document.getElementById('videoCount').textContent = 'Erreur';
+      }
+    }
+
+    function renderTodayVideoCards(videos) {
+      const container = document.getElementById('todayVideoCards');
+      const badge = document.getElementById('videoCount');
+      const section = document.getElementById('todayVideosSection');
+
+      if (!videos || videos.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎬</div>
+            <div class="empty-state-title">Aucune video aujourd'hui</div>
+            <div class="empty-state-sub">Pas de video planifiee pour aujourd'hui.</div>
+          </div>`;
+        badge.textContent = 'Aucune';
+        return;
+      }
+
+      const pending = videos.filter(v => v.statut === 'planifie' || v.statut === 'en_production');
+      badge.textContent = pending.length > 0 ? pending.length + ' restant' + (pending.length > 1 ? 's' : '') : 'Termine';
+
+      // Reuse the video card builder from the Videos tab
+      window._videoCardData = window._videoCardData || {};
+      container.innerHTML = videos.map((v, idx) => buildVideoCardHtml(v, idx)).join('');
+    }
   </script>
 </body>
 </html>
