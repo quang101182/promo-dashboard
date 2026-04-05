@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.5.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.6.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.5.0</title>
+  <title>Promo Dashboard v1.6.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -910,31 +910,10 @@
   <div class="tab-panel active" id="panel-today">
     <div class="container">
 
-      <!-- Section AUTO -->
+      <!-- Section TEXTES -->
       <div class="section-group">
         <div class="section-header">
-          <span class="section-title">AUTO</span>
-          <span class="section-badge" id="autoCount">0 restants</span>
-        </div>
-        <div id="autoCards">
-          <!-- Skeleton placeholders -->
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:40%;height:12px"></div>
-            <div class="skeleton-line" style="width:75%;height:14px"></div>
-            <div class="skeleton-line" style="width:55%;height:10px"></div>
-          </div>
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:35%;height:12px"></div>
-            <div class="skeleton-line" style="width:80%;height:14px"></div>
-            <div class="skeleton-line" style="width:50%;height:10px"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section MANUEL -->
-      <div class="section-group">
-        <div class="section-header">
-          <span class="section-title">MANUEL</span>
+          <span class="section-title">TEXTES</span>
           <span class="section-badge" id="manuelCount">0 restants</span>
         </div>
         <div id="manuelCards">
@@ -961,7 +940,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.5.0 — Promo Dashboard</div>
+      <div class="footer">v1.6.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -998,7 +977,7 @@
       <div class="section-group">
         <div class="section-header">
           <span class="section-title">VIDEOS DU JOUR</span>
-          <span class="section-badge" id="videoCount">0</span>
+          <span class="section-badge" id="videoCountStats">0</span>
         </div>
         <div id="videoCards">
           <div class="skeleton-card">
@@ -1014,7 +993,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.5.0 — Promo Dashboard</div>
+      <div class="footer">v1.6.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1104,7 +1083,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.5.0 — Promo Dashboard</div>
+      <div class="footer">v1.6.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1147,7 +1126,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.5.0';
+    const VERSION = '1.6.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1276,7 +1255,6 @@
       } catch (err) {
         console.error('fetchToday error:', err);
         showToast('Erreur chargement des cards', 'error', 3000);
-        renderErrorState('autoCards');
         renderErrorState('manuelCards');
       }
     }
@@ -1323,19 +1301,15 @@
     }
 
     function updateEmptyStateAllDone() {
-      ['autoCards', 'manuelCards'].forEach(id => {
-        const container = document.getElementById(id);
-        if (container && container.querySelector('.empty-state')) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">🎉</div>
-              <div class="empty-state-title">Tout est fait !</div>
-              <div class="empty-state-sub">Toutes les promos du jour ont été traitées.</div>
-            </div>`;
-        }
-      });
-      // Mettre a jour les badges
-      document.getElementById('autoCount').textContent = 'Terminé';
+      const container = document.getElementById('manuelCards');
+      if (container && container.querySelector('.empty-state')) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div class="empty-state-title">Tout est fait !</div>
+            <div class="empty-state-sub">Toutes les promos du jour ont été traitées.</div>
+          </div>`;
+      }
       document.getElementById('manuelCount').textContent = 'Terminé';
     }
 
@@ -1343,26 +1317,13 @@
     // RENDER CARDS
     // ============================================================
     function renderCards(rows) {
-      // Normalize mode from API 'type' field
-      rows.forEach(r => {
-        if (!r.mode) r.mode = (r.type || 'MANUEL').toUpperCase() === 'AUTO' ? 'auto' : 'manuel';
-      });
-      const autoRows   = rows.filter(r => r.mode === 'auto');
-      const manuelRows = rows.filter(r => r.mode !== 'auto');
+      renderCardList('manuelCards', rows, rows.length);
 
-      renderCardList('autoCards', autoRows, autoRows.length);
-      renderCardList('manuelCards', manuelRows, manuelRows.length);
-
-      function setBadge(elId, total, remaining) {
-        const el = document.getElementById(elId);
-        if (total === 0) el.textContent = 'Aucune tâche';
-        else if (remaining === 0) el.textContent = 'Terminé';
-        else el.textContent = remaining + ' restant' + (remaining !== 1 ? 's' : '');
-      }
-      const autoRemaining = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-      const manuelRemaining = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-      setBadge('autoCount', autoRows.length, autoRemaining);
-      setBadge('manuelCount', manuelRows.length, manuelRemaining);
+      const remaining = rows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+      const el = document.getElementById('manuelCount');
+      if (rows.length === 0) el.textContent = 'Aucune tâche';
+      else if (remaining === 0) el.textContent = 'Terminé';
+      else el.textContent = remaining + ' restant' + (remaining !== 1 ? 's' : '');
     }
 
     function renderCardList(containerId, rows, totalFromApi) {
@@ -1559,7 +1520,6 @@
         if (card.parentNode) card.parentNode.removeChild(card);
         updateLocalStats();
         refreshSectionCounts();
-        checkEmptyContainer('autoCards', 'auto');
         checkEmptyContainer('manuelCards', 'manuel');
       }, 400);
 
@@ -1696,20 +1656,11 @@
     }
 
     function refreshSectionCounts() {
-      const autoRows   = state.cards.filter(r => r.mode === 'auto');
-      const manuelRows = state.cards.filter(r => r.mode !== 'auto');
-
-      if (autoRows.length === 0) {
-        document.getElementById('autoCount').textContent = 'Aucune tâche';
-      } else {
-        const autoRem = autoRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
-        document.getElementById('autoCount').textContent = autoRem + ' restant' + (autoRem !== 1 ? 's' : '');
-      }
-
-      if (manuelRows.length === 0) {
+      const allRows = state.cards;
+      if (allRows.length === 0) {
         document.getElementById('manuelCount').textContent = 'Aucune tâche';
       } else {
-        const manuelRem = manuelRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
+        const manuelRem = allRows.filter(r => !state.done.has(r.row) && !state.skipped.has(r.row)).length;
         document.getElementById('manuelCount').textContent = manuelRem + ' restant' + (manuelRem !== 1 ? 's' : '');
       }
     }
@@ -1948,8 +1899,8 @@
     // ============================================================
     function renderVideoStats(stats) {
       if (!stats || !stats.ok) return;
-      const c = stats.content || {};
-      const p = stats.perf || {};
+      const c = stats.week_content || stats.content || {};
+      const p = stats.week_perf || stats.perf || {};
       document.getElementById('vstat-planifie').textContent = c.planifie ?? 0;
       document.getElementById('vstat-production').textContent = c.en_production ?? 0;
       document.getElementById('vstat-publie').textContent = c.publie ?? 0;
@@ -1968,7 +1919,7 @@
     // ============================================================
     function renderVideoCards(videos) {
       const container = document.getElementById('videoCards');
-      const countEl = document.getElementById('videoCount');
+      const countEl = document.getElementById('videoCountStats');
 
       if (!videos || videos.length === 0) {
         countEl.textContent = '0';
