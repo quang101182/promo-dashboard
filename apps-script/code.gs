@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.2.0
+// Version : v1.3.1
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -68,6 +68,9 @@ function doGet(e) {
         break;
       case 'setupVideo':
         result = setupVideo();
+        break;
+      case 'addMissingConfig':
+        result = addMissingConfig();
         break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
@@ -609,7 +612,10 @@ function seedTestData(ss) {
       ['Reddit',   'r/nocode',                  'https://www.reddit.com',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Reddit',   'r/n8n',                     'https://www.reddit.com',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Twitter',  '@BruceLi60392934',          'https://x.com/compose/tweet',                              'MANUEL', true,  'weekly',   '', 'Se7en Vision AI'],
-      ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/@se7en.video.ai',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+      ['TikTok',   '@se7en.video.ai',          'https://www.tiktok.com/@se7en.video.ai',                            'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools - Videos EN'],
+      ['TikTok',   '@se7en.news.ai',           'https://www.tiktok.com/@se7en.news.ai',                             'MANUEL', true,  'weekly',   '', '4323 followers - Videos FR'],
+      ['Instagram','Bruce Li',                  'https://www.instagram.com/',                                        'MANUEL', true,  'weekly',   '', 'Business account - Reels cross-post'],
+      ['YouTube',  '@se7enai',                  'https://www.youtube.com/',                                          'MANUEL', false, 'weekly',   '', 'Shorts - A configurer'],
       ['Dev.to',   '@se7enai',                 'https://dev.to/new',                                      'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
       ['LinkedIn', 'profil',                    'https://www.linkedin.com',                                'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
     ];
@@ -919,7 +925,10 @@ function resetMarketing() {
     ['Reddit',   'r/nocode',             'https://www.reddit.com',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Reddit',   'r/n8n',                'https://www.reddit.com',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Twitter',  '@BruceLi60392934',     'https://x.com/compose/tweet',                         'MANUEL', true,  'weekly',   '', 'Se7en Vision AI'],
-    ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/@se7en.video.ai',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools'],
+    ['TikTok',   '@se7en.video.ai',     'https://www.tiktok.com/@se7en.video.ai',                      'MANUEL', true,  'weekly',   '', '280 followers - Se7en AI Tools - Videos EN'],
+    ['TikTok',   '@se7en.news.ai',      'https://www.tiktok.com/@se7en.news.ai',                       'MANUEL', true,  'weekly',   '', '4323 followers - Videos FR'],
+    ['Instagram','Bruce Li',             'https://www.instagram.com/',                                  'MANUEL', true,  'weekly',   '', 'Business account - Reels cross-post'],
+    ['YouTube',  '@se7enai',             'https://www.youtube.com/',                                    'MANUEL', false, 'weekly',   '', 'Shorts - A configurer'],
     ['Dev.to',   '@se7enai',            'https://dev.to/new',                                 'MANUEL', true,  'weekly',   '', 'Cross-post articles'],
     ['LinkedIn', 'profil',               'https://www.linkedin.com',                           'MANUEL', false, '3x-week',  '', 'En pause - discretion employeur'],
   ];
@@ -1308,4 +1317,48 @@ function setupVideo() {
   }
 
   return { ok: true, message: 'Setup video complete - 5 onglets crees' };
+}
+
+// ── ADD MISSING CONFIG — Ajoute les plateformes manquantes sans reset ──
+
+function addMissingConfig() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_CONFIG);
+  if (!sheet) return { ok: false, error: 'Onglet Config introuvable' };
+
+  // Lire les groupes existants
+  var data = sheet.getDataRange().getValues();
+  var existing = {};
+  for (var i = 1; i < data.length; i++) {
+    var key = (data[i][0] || '') + '||' + (data[i][1] || '');
+    existing[key] = true;
+  }
+
+  // Plateformes a ajouter si absentes
+  var toAdd = [
+    ['TikTok',   '@se7en.news.ai',  'https://www.tiktok.com/@se7en.news.ai',  'MANUEL', true,  'weekly', '', '4323 followers - Videos FR'],
+    ['Instagram','Bruce Li',         'https://www.instagram.com/',              'MANUEL', true,  'weekly', '', 'Business account - Reels cross-post'],
+    ['YouTube',  '@se7enai',         'https://www.youtube.com/',                'MANUEL', false, 'weekly', '', 'Shorts - A configurer'],
+  ];
+
+  var added = [];
+  for (var j = 0; j < toAdd.length; j++) {
+    var k = toAdd[j][0] + '||' + toAdd[j][1];
+    if (!existing[k]) {
+      sheet.appendRow(toAdd[j]);
+      added.push(toAdd[j][0] + ' / ' + toAdd[j][1]);
+    }
+  }
+
+  // Mettre a jour les notes du TikTok EN existant si besoin
+  for (var m = 1; m < data.length; m++) {
+    if (data[m][0] === 'TikTok' && data[m][1] === '@se7en.video.ai') {
+      var currentNotes = String(data[m][7] || '');
+      if (currentNotes.indexOf('Videos EN') === -1) {
+        sheet.getRange(m + 1, 8).setValue(currentNotes + ' - Videos EN');
+      }
+    }
+  }
+
+  return { ok: true, added: added, message: added.length > 0 ? added.length + ' plateforme(s) ajoutee(s)' : 'Toutes les plateformes sont deja presentes' };
 }

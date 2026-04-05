@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.3.1 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.4.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.3.1</title>
+  <title>Promo Dashboard v1.4.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -946,7 +946,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.3.1 — Promo Dashboard</div>
+      <div class="footer">v1.4.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -999,7 +999,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.3.1 — Promo Dashboard</div>
+      <div class="footer">v1.4.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1085,9 +1085,11 @@
       </button>
       <div id="lastGenerate" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:6px;"></div>
 
+      <button onclick="addMissingPlatforms()" id="addPlatformsBtn" style="display:block;width:100%;margin-top:12px;padding:11px 20px;background:rgba(6,182,212,0.15);color:var(--accent-light);border:1px solid rgba(6,182,212,0.3);border-radius:var(--radius-btn);cursor:pointer;font-size:0.85rem;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s ease;">📡 Ajouter plateformes manquantes</button>
+
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.3.1 — Promo Dashboard</div>
+      <div class="footer">v1.4.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1130,7 +1132,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.3.1';
+    const VERSION = '1.4.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1139,6 +1141,7 @@
       linkedin:  '💼',
       tiktok:    '🎵',
       instagram: '📷',
+      youtube:   '▶️',
       devto:     '👩‍💻',
       'dev.to':  '👩‍💻',
     };
@@ -1150,6 +1153,7 @@
       linkedin:  '8h-10h ou 17h-18h',
       tiktok:    '18h-21h',
       instagram: '11h-13h ou 19h-21h',
+      youtube:   '14h-17h',
       devto:     '15h-17h (9h-11h EST)',
       'dev.to':  '15h-17h (9h-11h EST)',
     };
@@ -1623,6 +1627,32 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>⚡</span><span>Générer le planning du jour</span>';
+      }
+    }
+
+    // ============================================================
+    // ADD MISSING PLATFORMS
+    // ============================================================
+    async function addMissingPlatforms() {
+      if (!API_URL) { showToast('API non configuree', 'error'); return; }
+      const btn = document.getElementById('addPlatformsBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Ajout en cours...';
+      try {
+        const res = await fetch(`${API_URL}?action=addMissingConfig`, { redirect: 'follow' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(data.message, data.added && data.added.length > 0 ? 'success' : 'warning', 3000);
+          fetchConfig();
+        } else {
+          showToast('Erreur : ' + (data.error || 'inconnue'), 'error');
+        }
+      } catch (err) {
+        console.error('addMissingPlatforms error:', err);
+        showToast('Erreur ajout plateformes', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📡 Ajouter plateformes manquantes';
       }
     }
 
