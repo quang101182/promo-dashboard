@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.2.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.3.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.2.0</title>
+  <title>Promo Dashboard v1.3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -568,6 +568,306 @@
       color: var(--text-muted);
     }
 
+    /* ===== VIDEO CARDS ===== */
+    .video-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-card);
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-slow);
+      animation: cardFadeIn 0.3s ease backwards;
+    }
+    .video-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+    .video-card.done {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.35);
+      border-left-color: var(--success);
+    }
+    .video-card.done .video-hook,
+    .video-card.done .video-meta { opacity: 0.6; }
+    .video-card.skip-out { animation: slideOut 0.38s ease forwards; }
+
+    .video-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .video-platform-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .video-info { flex: 1; min-width: 0; }
+
+    .video-platform-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .video-hook {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .video-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .video-meta-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .video-lang-en { background: rgba(6, 182, 212, 0.18); color: var(--accent-light); }
+    .video-lang-fr { background: rgba(124, 58, 237, 0.18); color: var(--primary-light); }
+    .video-product { background: var(--border); color: var(--text-secondary); }
+    .video-duration { background: var(--border); color: var(--text-muted); }
+    .video-type-badge { background: rgba(124, 58, 237, 0.12); color: var(--primary-light); }
+
+    .video-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .video-status.planifie { background: rgba(245, 158, 11, 0.18); color: var(--warning); }
+    .video-status.en_production { background: rgba(6, 182, 212, 0.18); color: var(--accent-light); }
+    .video-status.publie { background: rgba(16, 185, 129, 0.18); color: var(--success); }
+    .video-status.skip { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+
+    .video-cmd {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.75rem;
+      background: rgba(0,0,0,0.35);
+      color: var(--accent-light);
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      word-break: break-all;
+      line-height: 1.4;
+      transition: background var(--transition);
+      border: 1px solid var(--border);
+    }
+    .video-cmd:hover { background: rgba(0,0,0,0.5); }
+
+    .video-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-perf {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-light);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .btn-perf:hover { background: rgba(6, 182, 212, 0.25); }
+
+    /* ===== VIDEO STATS SUMMARY ===== */
+    .video-stats-summary {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 56px;
+    }
+    .video-stat-num {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .video-stat-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .video-stat-item.accent .video-stat-num { color: var(--accent-light); }
+    .video-stat-item.success .video-stat-num { color: var(--success); }
+    .video-stat-item.warning .video-stat-num { color: var(--warning); }
+
+    .video-best-hook {
+      width: 100%;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .video-best-hook strong { color: var(--accent-light); }
+
+    /* ===== DAY GROUP HEADER ===== */
+    .video-day-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ===== PERF MODAL ===== */
+    .perf-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.2s ease;
+    }
+    .perf-modal-overlay.active { display: flex; align-items: flex-end; justify-content: center; }
+
+    @media (min-width: 768px) {
+      .perf-modal-overlay.active { align-items: center; }
+      .perf-modal { max-height: 85vh; border-radius: var(--radius-card) !important; }
+    }
+
+    .perf-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .perf-modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .perf-modal-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .perf-form { display: flex; flex-direction: column; gap: 10px; }
+
+    .perf-row {
+      display: flex;
+      gap: 10px;
+    }
+    .perf-row > .perf-field { flex: 1; }
+
+    .perf-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .perf-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .perf-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text);
+      transition: border-color var(--transition);
+    }
+    .perf-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .perf-input::placeholder { color: var(--text-muted); }
+
+    .perf-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-perf-submit {
+      flex: 1;
+      padding: 11px 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-perf-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-perf-submit:active { transform: scale(0.97); }
+    .btn-perf-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-perf-cancel {
+      padding: 11px 20px;
+      background: var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-perf-cancel:hover { background: var(--text-muted); color: var(--text); }
+
     /* ===== RESPONSIVE 768px+ ===== */
     @media (min-width: 768px) {
       .container { padding: 20px 24px; }
@@ -575,6 +875,7 @@
       .tabs { padding: 14px 24px 0; }
       .api-banner { margin: 16px 24px; }
       .card-actions { flex-wrap: nowrap; }
+      .video-actions { flex-wrap: nowrap; }
       .stats-bar { justify-content: center; gap: 40px; }
     }
   </style>
@@ -594,6 +895,7 @@
   <!-- TABS -->
   <nav class="tabs">
     <button class="tab-btn active" onclick="switchTab('today')" id="tab-today">Aujourd'hui</button>
+    <button class="tab-btn" onclick="switchTab('videos')" id="tab-videos">Videos</button>
     <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">Settings</button>
   </nav>
 
@@ -643,7 +945,120 @@
         </div>
       </div>
 
-      <div class="footer">v1.2.0 — Promo Dashboard</div>
+      <div class="footer">v1.3.0 — Promo Dashboard</div>
+    </div>
+  </div>
+
+  <!-- TAB: VIDEOS -->
+  <div class="tab-panel" id="panel-videos">
+    <div class="container">
+
+      <!-- Week Stats Summary -->
+      <div class="video-stats-summary" id="videoStatsSummary">
+        <div class="video-stat-item warning">
+          <span class="video-stat-num" id="vstat-planifie">-</span>
+          <span class="video-stat-label">Planifie</span>
+        </div>
+        <div class="video-stat-item accent">
+          <span class="video-stat-num" id="vstat-production">-</span>
+          <span class="video-stat-label">En prod</span>
+        </div>
+        <div class="video-stat-item success">
+          <span class="video-stat-num" id="vstat-publie">-</span>
+          <span class="video-stat-label">Publie</span>
+        </div>
+        <div class="video-stat-item">
+          <span class="video-stat-num" id="vstat-skip">-</span>
+          <span class="video-stat-label">Skip</span>
+        </div>
+        <div class="video-stat-item accent">
+          <span class="video-stat-num" id="vstat-vues">-</span>
+          <span class="video-stat-label">Vues</span>
+        </div>
+        <div class="video-best-hook" id="vstat-besthook"></div>
+      </div>
+
+      <!-- Videos du jour -->
+      <div class="section-group">
+        <div class="section-header">
+          <span class="section-title">VIDEOS DU JOUR</span>
+          <span class="section-badge" id="videoCount">0</span>
+        </div>
+        <div id="videoCards">
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:40%;height:12px"></div>
+            <div class="skeleton-line" style="width:80%;height:14px"></div>
+            <div class="skeleton-line" style="width:55%;height:10px"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-line" style="width:35%;height:12px"></div>
+            <div class="skeleton-line" style="width:75%;height:14px"></div>
+            <div class="skeleton-line" style="width:50%;height:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">v1.3.0 — Promo Dashboard</div>
+    </div>
+  </div>
+
+  <!-- PERF MODAL -->
+  <div class="perf-modal-overlay" id="perfModalOverlay" onclick="if(event.target===this)closePerfModal()">
+    <div class="perf-modal">
+      <div class="perf-modal-title">Performances video</div>
+      <div class="perf-modal-sub" id="perfModalSub"></div>
+      <div class="perf-form">
+        <div class="perf-row">
+          <div class="perf-field">
+            <label class="perf-label">Vues</label>
+            <input class="perf-input" type="number" id="perf-vues" placeholder="0" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Watch moyen (s)</label>
+            <input class="perf-input" type="number" id="perf-watchMoyen" placeholder="0" step="0.1" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Completion (%)</label>
+            <input class="perf-input" type="number" id="perf-completion" placeholder="0" step="0.1" />
+          </div>
+        </div>
+        <div class="perf-row">
+          <div class="perf-field">
+            <label class="perf-label">Likes</label>
+            <input class="perf-input" type="number" id="perf-likes" placeholder="0" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Comments</label>
+            <input class="perf-input" type="number" id="perf-comments" placeholder="0" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Shares</label>
+            <input class="perf-input" type="number" id="perf-shares" placeholder="0" />
+          </div>
+        </div>
+        <div class="perf-row">
+          <div class="perf-field">
+            <label class="perf-label">Profil visits</label>
+            <input class="perf-input" type="number" id="perf-profilVisits" placeholder="0" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Bio clicks</label>
+            <input class="perf-input" type="number" id="perf-bioClicks" placeholder="0" />
+          </div>
+          <div class="perf-field">
+            <label class="perf-label">Installs</label>
+            <input class="perf-input" type="number" id="perf-installs" placeholder="0" />
+          </div>
+        </div>
+        <div class="perf-field">
+          <label class="perf-label">Notes</label>
+          <input class="perf-input" type="text" id="perf-notes" placeholder="Notes libres..." />
+        </div>
+        <div class="perf-btn-row">
+          <button class="btn-perf-cancel" onclick="closePerfModal()">Annuler</button>
+          <button class="btn-perf-submit" id="perfSubmitBtn" onclick="submitPerf()">Enregistrer</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -671,7 +1086,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.2.0 — Promo Dashboard</div>
+      <div class="footer">v1.3.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -714,7 +1129,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.1.0';
+    const VERSION = '1.3.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -778,6 +1193,14 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('panel-' + name).classList.add('active');
       document.getElementById('tab-' + name).classList.add('active');
+      // Lazy-load videos on first switch
+      if (name === 'videos') fetchTodayVideos();
+      // Update stats bar context
+      if (name === 'videos') {
+        document.querySelector('.stats-bar').style.display = 'none';
+      } else {
+        document.querySelector('.stats-bar').style.display = '';
+      }
     }
 
     // ============================================================
@@ -1292,7 +1715,9 @@
     async function refreshAll() {
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
-      await Promise.all([fetchToday(), fetchConfig()]);
+      const promises = [fetchToday(), fetchConfig()];
+      if (videoState.loaded) promises.push(fetchTodayVideos());
+      await Promise.all(promises);
       updateRefreshTime();
       setTimeout(() => btn.classList.remove('spinning'), 400);
       showToast('🔄 Données actualisées', 'success', 1500);
@@ -1320,6 +1745,31 @@
       if (!btn) return;
       const action = btn.dataset.action;
       const row = parseInt(btn.dataset.row, 10);
+      // Video card actions
+      if (action === 'vcopy') {
+        const vd = (window._videoCardData || {})[btn.dataset.vkey] || {};
+        copyText(vd.promoCmd || '');
+        return;
+      }
+      if (action === 'vcmd-copy') {
+        const vd = (window._videoCardData || {})[btn.dataset.vkey] || {};
+        copyText(vd.promoCmd || '');
+        return;
+      }
+      if (action === 'vpublie') {
+        updateVideoStatus(parseInt(btn.dataset.vrow, 10), 'publie');
+        return;
+      }
+      if (action === 'vskip') {
+        updateVideoStatus(parseInt(btn.dataset.vrow, 10), 'skip');
+        return;
+      }
+      if (action === 'vperf') {
+        const vd = (window._videoCardData || {})[btn.dataset.vkey] || {};
+        openPerfModal(vd);
+        return;
+      }
+      // Promo card actions
       const d = (window._cardData || {})[row] || {};
       switch (action) {
         case 'copy':  copyText(d.copyTxt || ''); break;
@@ -1411,6 +1861,297 @@
       navigator.clipboard.writeText(text).then(() => {
         showToast('Debug copie !', 'success', 1500);
       });
+    }
+
+    // ============================================================
+    // VIDEO STATE
+    // ============================================================
+    let videoState = {
+      videos: [],
+      weekStats: null,
+      currentPerfVideo: null,
+      loaded: false,
+    };
+
+    window._videoCardData = {};
+
+    // ============================================================
+    // FETCH TODAY VIDEOS
+    // ============================================================
+    async function fetchTodayVideos() {
+      if (!checkApiUrl()) { renderMockVideos(); return; }
+      try {
+        const [todayRes, statsRes] = await Promise.all([
+          fetch(`${API_URL}?action=todayVideos`, { redirect: 'follow' }).then(r => r.json()),
+          fetch(`${API_URL}?action=videoStats`, { redirect: 'follow' }).then(r => r.json()),
+        ]);
+        videoState.videos = todayRes.videos || [];
+        videoState.weekStats = statsRes;
+        videoState.loaded = true;
+        renderVideoStats(statsRes);
+        renderVideoCards(videoState.videos);
+      } catch (err) {
+        console.error('fetchTodayVideos error:', err);
+        showToast('Erreur chargement videos', 'error', 3000);
+        renderErrorState('videoCards');
+      }
+    }
+
+    // ============================================================
+    // RENDER VIDEO STATS SUMMARY
+    // ============================================================
+    function renderVideoStats(stats) {
+      if (!stats || !stats.ok) return;
+      const c = stats.content || {};
+      const p = stats.perf || {};
+      document.getElementById('vstat-planifie').textContent = c.planifie ?? 0;
+      document.getElementById('vstat-production').textContent = c.en_production ?? 0;
+      document.getElementById('vstat-publie').textContent = c.publie ?? 0;
+      document.getElementById('vstat-skip').textContent = c.skip ?? 0;
+      document.getElementById('vstat-vues').textContent = p.total_vues ?? 0;
+      const bestHookEl = document.getElementById('vstat-besthook');
+      if (p.best_hook) {
+        bestHookEl.innerHTML = 'Best hook: <strong>' + escHtml(p.best_hook) + '</strong>';
+      } else {
+        bestHookEl.innerHTML = '';
+      }
+    }
+
+    // ============================================================
+    // RENDER VIDEO CARDS
+    // ============================================================
+    function renderVideoCards(videos) {
+      const container = document.getElementById('videoCards');
+      const countEl = document.getElementById('videoCount');
+
+      if (!videos || videos.length === 0) {
+        countEl.textContent = '0';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎬</div>
+            <div class="empty-state-title">Aucune video aujourd'hui</div>
+            <div class="empty-state-sub">Pas de video planifiee pour aujourd'hui.</div>
+          </div>`;
+        return;
+      }
+
+      // Check if all videos are from today
+      const today = new Date().toISOString().split('T')[0];
+      const todayVideos = videos.filter(v => (v.date || '').startsWith(today));
+
+      if (todayVideos.length > 0) {
+        // Show today's videos
+        countEl.textContent = todayVideos.length;
+        container.innerHTML = todayVideos.map((v, idx) => buildVideoCardHtml(v, idx)).join('');
+      } else {
+        // Group by day
+        countEl.textContent = videos.length + ' (semaine)';
+        const grouped = {};
+        videos.forEach(v => {
+          const day = (v.date || 'Sans date').split('T')[0];
+          if (!grouped[day]) grouped[day] = [];
+          grouped[day].push(v);
+        });
+        let html = '';
+        Object.keys(grouped).sort().forEach(day => {
+          html += `<div class="video-day-header">${escHtml(day)}</div>`;
+          html += grouped[day].map((v, idx) => buildVideoCardHtml(v, idx)).join('');
+        });
+        container.innerHTML = html;
+      }
+    }
+
+    // ============================================================
+    // BUILD SINGLE VIDEO CARD HTML
+    // ============================================================
+    function buildVideoCardHtml(v, idx) {
+      const platformKey = (v.plateforme || '').toLowerCase();
+      const icon = PLATFORM_ICONS[platformKey] || '🎬';
+      const statut = (v.statut || 'planifie').toLowerCase().replace(/ /g, '_');
+      const isPublie = statut === 'publie';
+      const cardClass = isPublie ? 'video-card done' : 'video-card';
+      const delay = idx * 0.05;
+      const langClass = (v.langue || '').toUpperCase() === 'FR' ? 'video-lang-fr' : 'video-lang-en';
+      const langLabel = (v.langue || 'EN').toUpperCase();
+      const vkey = (v._row || idx) + '-' + (v.plateforme || '') + '-' + idx;
+
+      // Store video data for event delegation
+      window._videoCardData[vkey] = {
+        ...v,
+        promoCmd: v.promoCmd || '',
+        vkey: vkey,
+      };
+
+      const statusHtml = `<span class="video-status ${statut}">${escHtml(v.statut || 'planifie')}</span>`;
+
+      const cmdHtml = v.promoCmd
+        ? `<div class="video-cmd" data-action="vcmd-copy" data-vkey="${escHtml(vkey)}" title="Cliquer pour copier">${escHtml(v.promoCmd)}</div>`
+        : '';
+
+      const linkHtml = v.lien
+        ? `<a href="${escHtml(v.lien)}" target="_blank" style="font-size:0.72rem;color:var(--accent-light);text-decoration:none;margin-bottom:6px;display:inline-block;">🔗 Voir</a>`
+        : '';
+
+      return `
+        <div class="${cardClass}" id="vcard-${v._row || idx}" style="animation-delay:${delay}s">
+          <div class="video-top">
+            <div class="video-platform-icon">${icon}</div>
+            <div class="video-info">
+              <div class="video-platform-name">${escHtml(v.plateforme || '')} · ${escHtml(v.compte || '')}</div>
+              <div class="video-hook">${escHtml(v.hook || 'Sans hook')}</div>
+              <div class="video-meta">
+                <span class="video-meta-badge ${langClass}">${langLabel}</span>
+                ${v.produit ? `<span class="video-meta-badge video-product">${escHtml(v.produit)}</span>` : ''}
+                ${v.type ? `<span class="video-meta-badge video-type-badge">${escHtml(v.type)}</span>` : ''}
+                ${v.duree ? `<span class="video-meta-badge video-duration">⏱ ${escHtml(v.duree)}</span>` : ''}
+                ${statusHtml}
+              </div>
+            </div>
+          </div>
+          ${cmdHtml}
+          ${linkHtml}
+          <div class="video-actions">
+            ${v.promoCmd ? `<button class="btn btn-copy" data-action="vcopy" data-vkey="${escHtml(vkey)}">📋 Copier cmd</button>` : ''}
+            ${!isPublie ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publie</button>` : ''}
+            ${!isPublie && statut !== 'skip' ? `<button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
+            <button class="btn btn-perf" data-action="vperf" data-vkey="${escHtml(vkey)}">📊 Perfs</button>
+          </div>
+          ${v.notes ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">📝 ${escHtml(v.notes)}</div>` : ''}
+        </div>`;
+    }
+
+    // ============================================================
+    // UPDATE VIDEO STATUS
+    // ============================================================
+    async function updateVideoStatus(row, statut) {
+      if (!row) { showToast('Row manquant', 'error'); return; }
+
+      // Optimistic UI
+      const card = document.getElementById('vcard-' + row);
+      if (statut === 'publie' && card) {
+        card.classList.add('done');
+        showToast('✅ Marque comme publie !', 'success');
+      }
+      if (statut === 'skip' && card) {
+        card.classList.add('skip-out');
+        showToast('⏭ Video passee', 'warning', 1500);
+        setTimeout(() => { if (card.parentNode) card.parentNode.removeChild(card); }, 400);
+      }
+
+      if (!API_URL) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'updateVideoStatus', row, statut }),
+          redirect: 'follow',
+        });
+        // Refresh stats
+        setTimeout(() => fetchTodayVideos(), 500);
+      } catch (err) {
+        console.error('updateVideoStatus error:', err);
+        showToast('Erreur sync statut video', 'error');
+      }
+    }
+
+    // ============================================================
+    // PERF MODAL
+    // ============================================================
+    function openPerfModal(video) {
+      videoState.currentPerfVideo = video;
+      const sub = document.getElementById('perfModalSub');
+      sub.textContent = (video.plateforme || '') + ' · ' + (video.compte || '') + ' · ' + (video.hook || '').substring(0, 50);
+
+      // Reset fields
+      ['vues', 'watchMoyen', 'completion', 'likes', 'comments', 'shares', 'profilVisits', 'bioClicks', 'installs', 'notes'].forEach(f => {
+        const el = document.getElementById('perf-' + f);
+        if (el) el.value = '';
+      });
+
+      document.getElementById('perfModalOverlay').classList.add('active');
+    }
+
+    function closePerfModal() {
+      document.getElementById('perfModalOverlay').classList.remove('active');
+      videoState.currentPerfVideo = null;
+    }
+
+    async function submitPerf() {
+      const v = videoState.currentPerfVideo;
+      if (!v) return;
+
+      const btn = document.getElementById('perfSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Envoi...';
+
+      const payload = {
+        action: 'updatePerf',
+        date: v.date || new Date().toISOString().split('T')[0],
+        plateforme: v.plateforme || '',
+        compte: v.compte || '',
+        hook: v.hook || '',
+        langue: v.langue || '',
+        vues: parseInt(document.getElementById('perf-vues').value) || 0,
+        watchMoyen: parseFloat(document.getElementById('perf-watchMoyen').value) || 0,
+        completion: parseFloat(document.getElementById('perf-completion').value) || 0,
+        likes: parseInt(document.getElementById('perf-likes').value) || 0,
+        comments: parseInt(document.getElementById('perf-comments').value) || 0,
+        shares: parseInt(document.getElementById('perf-shares').value) || 0,
+        profilVisits: parseInt(document.getElementById('perf-profilVisits').value) || 0,
+        bioClicks: parseInt(document.getElementById('perf-bioClicks').value) || 0,
+        installs: parseInt(document.getElementById('perf-installs').value) || 0,
+        score: 0,
+        notes: document.getElementById('perf-notes').value || '',
+      };
+
+      // Compute a simple score
+      payload.score = payload.vues + (payload.likes * 5) + (payload.comments * 10) + (payload.shares * 8) + (payload.installs * 20);
+
+      if (!API_URL) {
+        showToast('Perfs enregistrees (mock)', 'success');
+        closePerfModal();
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer';
+        return;
+      }
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          redirect: 'follow',
+        });
+        showToast('📊 Performances enregistrees !', 'success', 2500);
+        closePerfModal();
+        // Refresh stats
+        setTimeout(() => fetchTodayVideos(), 500);
+      } catch (err) {
+        console.error('submitPerf error:', err);
+        showToast('Erreur envoi performances', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer';
+      }
+    }
+
+    // ============================================================
+    // MOCK VIDEOS (quand API_URL est vide)
+    // ============================================================
+    function renderMockVideos() {
+      const mockVideos = [
+        { _row: 101, date: new Date().toISOString().split('T')[0], plateforme: 'tiktok', compte: '@dictokey', type: 'Hook', produit: 'DictoKey', hook: 'Tu tapes encore avec tes pouces ? Essaie ca...', langue: 'FR', duree: '30s', lien: '', statut: 'planifie', notes: '', promoCmd: '/promo video tiktok @dictokey FR "Tu tapes encore avec tes pouces ?"' },
+        { _row: 102, date: new Date().toISOString().split('T')[0], plateforme: 'instagram', compte: '@nocodeflow', type: 'Demo', produit: 'NoCodeFlow', hook: 'Build a full app without code in 60 seconds', langue: 'EN', duree: '60s', lien: '', statut: 'en_production', notes: 'Ajouter sous-titres', promoCmd: '/promo video instagram @nocodeflow EN "Build a full app without code"' },
+        { _row: 103, date: new Date().toISOString().split('T')[0], plateforme: 'tiktok', compte: '@dictokey', type: 'Tuto', produit: 'DictoKey', hook: '3 raccourcis clavier que personne connait', langue: 'FR', duree: '45s', lien: 'https://example.com', statut: 'publie', notes: '', promoCmd: '/promo video tiktok @dictokey FR "3 raccourcis clavier"' },
+      ];
+      videoState.videos = mockVideos;
+      videoState.loaded = true;
+      renderVideoStats({
+        ok: true,
+        content: { planifie: 1, en_production: 1, publie: 1, skip: 0, total: 3 },
+        perf: { total_vues: 1250, total_likes: 89, best_hook: 'Tu tapes encore avec tes pouces ?', best_completion: 72 },
+      });
+      renderVideoCards(mockVideos);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
