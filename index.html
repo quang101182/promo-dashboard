@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.4.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.5.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.4.0</title>
+  <title>Promo Dashboard v2.5.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1316,7 +1316,7 @@
         </div>
       </div>
 
-      <div class="footer">v2.4.0 — Promo Dashboard</div>
+      <div class="footer">v2.5.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1428,7 +1428,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.4.0 — Promo Dashboard</div>
+      <div class="footer">v2.5.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -2402,7 +2402,7 @@
     }
 
     // ============================================================
-    // WEEK VIEW — v2.4.0 ecran principal unifie
+    // WEEK VIEW — v2.5.0 ecran principal unifie
     // ============================================================
     let weekConfigCache = null;
     let weekVideosCache = null;
@@ -2618,8 +2618,12 @@
       const videos = weekVideosCache || [];
       const planning = weekPlanningCache || [];
 
+      // Store copy texts in JS object (HTML attributes strip newlines)
+      window._weekCopyData = {};
+
       // --- Calcul resume semaine ---
       let weekTotalTextes = 0, weekTotalVideos = 0, weekDone = 0;
+      let todayStats = { done: 0, skipped: 0, pending: 0, total: 0 };
 
       // --- Generer le HTML jour par jour ---
       let daysHtml = '';
@@ -2676,6 +2680,14 @@
         weekTotalVideos += allVideoCount;
         weekDone += progressDone;
 
+        // Stats du jour courant pour la barre du bas
+        if (day.isToday) {
+          todayStats.total = totalCount;
+          todayStats.done = doneCount;
+          todayStats.skipped = skippedCount;
+          todayStats.pending = Math.max(0, totalCount - doneCount - skippedCount);
+        }
+
         const totalCount = dayTextes.length + allVideoCount;
         let nextActionForDay = false;
 
@@ -2720,6 +2732,7 @@
             const wkey = 'wt-' + day.isoStr + '-' + t._row;
             const resolvedText = matchedPlan && matchedPlan.textes && matchedPlan.textes.length > 0 ? matchedPlan.textes[0].resolved : '';
             const copyTxt = resolvedText || articleTitle || t.group;
+            window._weekCopyData[wkey] = copyTxt;
 
             daysHtml += `
               <div class="week-rich-card type-texte ${statusClass}${isNextAction ? ' is-next-action' : ''}">
@@ -2733,7 +2746,7 @@
                   </div>
                 </div>
                 <div class="card-actions">
-                  <button class="btn btn-copy" data-copytxt="${escHtml(copyTxt)}" onclick="copyText(this.dataset.copytxt)">📋 Copier</button>
+                  <button class="btn btn-copy" data-wkey="${escHtml(wkey)}" onclick="copyText((window._weekCopyData||{})[this.dataset.wkey]||'')">📋 Copier</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
                   ${(day.isToday || day.isPast) && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
                   ${(day.isToday || day.isPast) && isDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Fait</span>' : ''}
@@ -2759,6 +2772,8 @@
             if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
 
             const promoCmd = generatePromoCmd(t.group, day.isoStr, configIdx);
+            const vwkey = 'wv-' + day.isoStr + '-' + configIdx;
+            window._weekCopyData[vwkey] = promoCmd;
 
             daysHtml += `
               <div class="week-rich-card type-video ${statusClass}${isNextAction ? ' is-next-action' : ''}">
@@ -2772,7 +2787,7 @@
                   </div>
                 </div>
                 <div class="card-actions">
-                  <button class="btn btn-copy" data-copytxt="${escHtml(promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>
+                  <button class="btn btn-copy" data-wkey="${escHtml(vwkey)}" onclick="copyText((window._weekCopyData||{})[this.dataset.wkey]||'')">📋 Copier cmd</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
                   ${(day.isToday || day.isPast) && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
                 </div>
@@ -2806,7 +2821,7 @@
                   </div>
                 </div>
                 <div class="card-actions">
-                  ${v.promoCmd ? `<button class="btn btn-copy" data-copytxt="${escHtml(v.promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>` : ''}
+                  ${v.promoCmd ? (() => { const cvk = 'vc-' + day.isoStr + '-' + (v._row||idx); window._weekCopyData[cvk] = v.promoCmd; return `<button class="btn btn-copy" data-wkey="${escHtml(cvk)}" onclick="copyText((window._weekCopyData||{})[this.dataset.wkey]||'')">📋 Copier cmd</button>`; })() : ''}
                   ${(day.isToday || day.isPast) && !vDone ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publié</button><button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
                   ${(day.isToday || day.isPast) && vDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Publié</span>' : ''}
                 </div>
@@ -2828,6 +2843,14 @@
       </div>`;
 
       content.innerHTML = summaryHtml + daysHtml;
+
+      // Mettre a jour la barre stats du bas avec les donnees du jour courant
+      updateStatsBar({
+        done: todayStats.done,
+        skip: todayStats.skipped,
+        pending: todayStats.pending,
+        total: todayStats.total
+      });
     }
 
     // Toggle jour plie/deplie
@@ -3022,7 +3045,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
-      // v2.4.0 : vue semaine = ecran principal
+      // v2.5.0 : vue semaine = ecran principal
       weekOffset = 0;
       loadWeekView().then(updateRefreshTime);
       fetchConfig();
