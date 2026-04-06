@@ -2795,7 +2795,7 @@
           });
 
           // Videos provenant du Contenu sheet (planifiees)
-          dayVideos.forEach(v => {
+          dayVideos.forEach((v, vIdx) => {
             const platformKey = (v.plateforme || '').toLowerCase();
             const icon = PLATFORM_ICONS[platformKey] || '🎬';
             const vStatus = (v.statut || '').toLowerCase();
@@ -2805,6 +2805,9 @@
             const langLabel = (v.langue || 'EN').toUpperCase();
             const isNextAction = day.isToday && !vDone && !firstNextActionSet && !nextActionForDay;
             if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
+
+            const cvk = 'vc-' + day.isoStr + '-' + (v._row || vIdx);
+            if (v.promoCmd) window._weekCopyData[cvk] = v.promoCmd;
 
             daysHtml += `
               <div class="week-rich-card type-video ${statusClass}${isNextAction ? ' is-next-action' : ''}">
@@ -2821,7 +2824,7 @@
                   </div>
                 </div>
                 <div class="card-actions">
-                  ${v.promoCmd ? (() => { const cvk = 'vc-' + day.isoStr + '-' + (v._row||idx); window._weekCopyData[cvk] = v.promoCmd; return `<button class="btn btn-copy" data-wkey="${escHtml(cvk)}" onclick="copyText((window._weekCopyData||{})[this.dataset.wkey]||'')">📋 Copier cmd</button>`; })() : ''}
+                  ${v.promoCmd ? `<button class="btn btn-copy" data-wkey="${escHtml(cvk)}" onclick="copyText((window._weekCopyData||{})[this.dataset.wkey]||'')">📋 Copier cmd</button>` : ''}
                   ${(day.isToday || day.isPast) && !vDone ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publié</button><button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
                   ${(day.isToday || day.isPast) && vDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Publié</span>' : ''}
                 </div>
