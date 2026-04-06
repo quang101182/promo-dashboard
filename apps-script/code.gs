@@ -94,6 +94,9 @@ function doGet(e) {
       case 'setupAssets':
         result = setupAssets();
         break;
+      case 'listFolder':
+        result = listDriveFolder(e && e.parameter ? e.parameter.folderId : '');
+        break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
     }
@@ -1986,4 +1989,32 @@ function updateAssetUsage(body) {
   }
 
   return { ok: false, error: 'Asset non trouvé avec fileId : ' + fileId };
+}
+
+// ── ACTION : listFolder (GET) — Lister les fichiers d'un dossier Drive ──
+
+function listDriveFolder(folderId) {
+  if (!folderId) return { ok: false, error: 'folderId requis' };
+
+  try {
+    var folder = DriveApp.getFolderById(folderId);
+    var files = folder.getFiles();
+    var result = [];
+
+    while (files.hasNext()) {
+      var f = files.next();
+      result.push({
+        fileId: f.getId(),
+        name: f.getName(),
+        mimeType: f.getMimeType(),
+        size: f.getSize(),
+        created: formatDate(f.getDateCreated()),
+        url: f.getUrl()
+      });
+    }
+
+    return { ok: true, files: result, folder: folder.getName() };
+  } catch (e) {
+    return { ok: false, error: 'Dossier introuvable : ' + e.toString() };
+  }
 }
