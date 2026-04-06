@@ -1298,7 +1298,7 @@
 
       <!-- Boutons Tout plier / Tout deplier -->
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
-        <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto-lancement OFF</button>
+        <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto Vidéo OFF</button>
         <div style="display:flex;gap:6px;">
           <button class="btn-week-toggle" onclick="toggleAllDays(false)">▲ Tout plier</button>
           <button class="btn-week-toggle" onclick="toggleAllDays(true)">▼ Tout déplier</button>
@@ -2731,9 +2731,9 @@
                 <div class="card-actions">
                   <button class="btn btn-copy" data-copytxt="${escHtml(copyTxt)}" onclick="copyText(this.dataset.copytxt)">📋 Copier</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
-                  ${day.isToday && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
-                  ${day.isToday && isDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Fait</span>' : ''}
-                  ${day.isToday && isSkipped ? '<span style="color:var(--text-muted);font-weight:600;font-size:0.78rem;">⏭ Skippé</span>' : ''}
+                  ${(day.isToday || day.isPast) && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
+                  ${(day.isToday || day.isPast) && isDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Fait</span>' : ''}
+                  ${(day.isToday || day.isPast) && isSkipped ? '<span style="color:var(--text-muted);font-weight:600;font-size:0.78rem;">⏭ Skippé</span>' : ''}
                 </div>
               </div>`;
           });
@@ -2770,7 +2770,7 @@
                 <div class="card-actions">
                   <button class="btn btn-copy" data-copytxt="${escHtml(promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
-                  ${day.isToday && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
+                  ${(day.isToday || day.isPast) && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
                 </div>
               </div>`;
           });
@@ -2803,8 +2803,8 @@
                 </div>
                 <div class="card-actions">
                   ${v.promoCmd ? `<button class="btn btn-copy" data-copytxt="${escHtml(v.promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>` : ''}
-                  ${day.isToday && !vDone ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publié</button><button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
-                  ${day.isToday && vDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Publié</span>' : ''}
+                  ${(day.isToday || day.isPast) && !vDone ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publié</button><button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
+                  ${(day.isToday || day.isPast) && vDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Publié</span>' : ''}
                 </div>
               </div>`;
           });
@@ -2874,12 +2874,12 @@
       const btn = document.getElementById('autoPromoBtn');
       if (!btn) return;
       if (autoPromoEnabled) {
-        btn.textContent = '▶ Auto 19h ON';
+        btn.textContent = '🎬 Auto Vidéo ON';
         btn.style.background = 'rgba(16,185,129,0.2)';
         btn.style.borderColor = 'var(--success)';
         btn.style.color = 'var(--success)';
       } else {
-        btn.textContent = '⏸ Auto 19h OFF';
+        btn.textContent = '⏸ Auto Vidéo OFF';
         btn.style.background = 'rgba(16,185,129,0.08)';
         btn.style.borderColor = 'rgba(16,185,129,0.3)';
         btn.style.color = 'var(--text-muted)';
@@ -2890,7 +2890,7 @@
       if (!API_URL) { showToast('API non configuree', 'error'); return; }
       autoPromoEnabled = !autoPromoEnabled;
       updateAutoPromoBtn();
-      showToast(autoPromoEnabled ? '▶ Auto-lancement activé (19h Paris)' : '⏸ Auto-lancement désactivé', autoPromoEnabled ? 'success' : 'warning', 2500);
+      showToast(autoPromoEnabled ? '🎬 Auto Vidéo activé (19h Paris)' : '⏸ Auto Vidéo désactivé', autoPromoEnabled ? 'success' : 'warning', 2500);
 
       try {
         await fetch(API_URL, {
