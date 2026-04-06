@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v2.0.0
+// Version : v2.3.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -84,6 +84,9 @@ function doGet(e) {
       case 'trendingAngles':
         result = getTrendingAngles();
         break;
+      case 'autoPromoStatus':
+        result = getAutoPromoStatus();
+        break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
     }
@@ -146,6 +149,9 @@ function doPost(e) {
         break;
       case 'updateStrategy':
         result = updateStrategy(body);
+        break;
+      case 'toggleAutoPromo':
+        result = toggleAutoPromo(body);
         break;
       default:
         result = { ok: false, error: 'Action POST inconnue : ' + action };
@@ -1607,6 +1613,70 @@ function getTrendingAngles() {
 
   var angles = (geminiResult.data && geminiResult.data.angles) ? geminiResult.data.angles : [];
   return { ok: true, angles: angles };
+}
+
+// ── ACTION : autoPromoStatus ─────────────────────────────────
+// Retourne l'état du flag auto_promo depuis la feuille Strategie
+
+function getAutoPromoStatus() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
+  if (!sheet) {
+    return { ok: true, enabled: false, hour: '19:00' };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][0] === 'auto_promo') {
+      var enabled = data[i][1] === true || data[i][1] === 'true';
+      var hour = '19:00';
+      // Chercher la ligne auto_promo_hour
+      for (var j = 0; j < data.length; j++) {
+        if (data[j][0] === 'auto_promo_hour') {
+          hour = data[j][1] || '19:00';
+          break;
+        }
+      }
+      return { ok: true, enabled: enabled, hour: hour };
+    }
+  }
+
+  return { ok: true, enabled: false, hour: '19:00' };
+}
+
+// ── ACTION : toggleAutoPromo ─────────────────────────────────
+// Active/désactive le flag auto_promo dans la feuille Strategie
+
+function toggleAutoPromo(body) {
+  var enabled = body.enabled === true || body.enabled === 'true';
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME_STRATEGIE);
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var foundPromo = false;
+  var foundHour = false;
+
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][0] === 'auto_promo') {
+      sheet.getRange(i + 1, 2).setValue(enabled);
+      foundPromo = true;
+    }
+    if (data[i][0] === 'auto_promo_hour') {
+      foundHour = true;
+    }
+  }
+
+  if (!foundPromo) {
+    sheet.appendRow(['auto_promo', enabled]);
+  }
+  if (!foundHour) {
+    sheet.appendRow(['auto_promo_hour', '19:00']);
+  }
+
+  return { ok: true, enabled: enabled };
 }
 
 // ── Helper : appeler Gemini Flash et parser la reponse JSON ──

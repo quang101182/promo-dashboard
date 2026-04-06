@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.2.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.3.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.2.0</title>
+  <title>Promo Dashboard v2.3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1297,9 +1297,12 @@
       </div>
 
       <!-- Boutons Tout plier / Tout deplier -->
-      <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px;">
-        <button class="btn-week-toggle" onclick="toggleAllDays(false)">▲ Tout plier</button>
-        <button class="btn-week-toggle" onclick="toggleAllDays(true)">▼ Tout déplier</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
+        <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto-lancement OFF</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-week-toggle" onclick="toggleAllDays(false)">▲ Tout plier</button>
+          <button class="btn-week-toggle" onclick="toggleAllDays(true)">▼ Tout déplier</button>
+        </div>
       </div>
 
       <!-- Contenu semaine -->
@@ -1310,7 +1313,7 @@
         </div>
       </div>
 
-      <div class="footer">v2.2.0 — Promo Dashboard</div>
+      <div class="footer">v2.3.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1422,7 +1425,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.2.0 — Promo Dashboard</div>
+      <div class="footer">v2.3.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -2396,7 +2399,7 @@
     }
 
     // ============================================================
-    // WEEK VIEW — v2.2.0 ecran principal unifie
+    // WEEK VIEW — v2.3.0 ecran principal unifie
     // ============================================================
     let weekConfigCache = null;
     let weekVideosCache = null;
@@ -2438,52 +2441,58 @@
     }
 
     function getWeekMonday(offset) {
-      const today = new Date();
-      const dow = today.getDay();
-      const diffToMon = dow === 0 ? -6 : 1 - dow;
-      const monday = new Date(today);
-      monday.setDate(today.getDate() + diffToMon + (offset * 7));
-      monday.setHours(0, 0, 0, 0);
-      return monday;
+      const days = getWeekDays(offset);
+      return days.length > 0 ? days[0].date : new Date();
     }
 
     function updateWeekNavLabel() {
-      const monday = getWeekMonday(weekOffset);
-      const friday = new Date(monday);
-      friday.setDate(monday.getDate() + 4);
+      const days = getWeekDays(weekOffset);
       const label = document.getElementById('weekNavLabel');
       const sub = document.getElementById('weekNavSub');
       if (weekOffset === 0) {
-        label.textContent = 'Cette semaine';
+        label.textContent = '5 prochains jours';
       } else if (weekOffset === -1) {
-        label.textContent = 'Semaine dernière';
+        label.textContent = '5 jours précédents';
       } else if (weekOffset === 1) {
-        label.textContent = 'Semaine prochaine';
+        label.textContent = '5 jours suivants';
       } else {
-        label.textContent = 'Semaine ' + (weekOffset > 0 ? '+' : '') + weekOffset;
+        label.textContent = (weekOffset > 0 ? '+' : '') + (weekOffset * 5) + ' jours';
       }
-      sub.textContent = monday.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' — ' + friday.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+      if (days.length >= 5) {
+        sub.textContent = days[0].date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' — ' + days[4].date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+      }
     }
 
     function getWeekDays(offset) {
-      const monday = getWeekMonday(offset || 0);
+      const startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+      // Shift by offset * 5 business days
+      let shift = (offset || 0) * 5;
+      if (shift > 0) {
+        while (shift > 0) { startDate.setDate(startDate.getDate() + 1); if (startDate.getDay() !== 0 && startDate.getDay() !== 6) shift--; }
+      } else if (shift < 0) {
+        while (shift < 0) { startDate.setDate(startDate.getDate() - 1); if (startDate.getDay() !== 0 && startDate.getDay() !== 6) shift++; }
+      }
+
       const todayDate = new Date();
       todayDate.setHours(0, 0, 0, 0);
+      const dayNamesFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
       const days = [];
-      const dayNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
-      for (let i = 0; i < 5; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        days.push({
-          name: dayNames[i],
-          date: d,
-          dateStr: d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
-          isoStr: toLocalISO(d),
-          isToday: d.getTime() === todayDate.getTime(),
-          isPast: d < todayDate,
-          dowIndex: i,
-        });
+      const cursor = new Date(startDate);
+      while (days.length < 5) {
+        if (cursor.getDay() !== 0 && cursor.getDay() !== 6) {
+          days.push({
+            name: dayNamesFR[cursor.getDay()],
+            date: new Date(cursor),
+            dateStr: cursor.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+            isoStr: toLocalISO(cursor),
+            isToday: cursor.getTime() === todayDate.getTime(),
+            isPast: cursor < todayDate,
+            dowIndex: days.length,
+          });
+        }
+        cursor.setDate(cursor.getDate() + 1);
       }
       return days;
     }
@@ -2519,6 +2528,84 @@
     const VIDEO_PLATFORMS = ['tiktok', 'instagram', 'youtube'];
     function isVideoPlatform(platform) {
       return VIDEO_PLATFORMS.includes((platform || '').toLowerCase());
+    }
+
+    // ============================================================
+    // PROMO CMD GENERATOR — hooks marketing qui convertissent
+    // ============================================================
+    const PROMO_HOOKS_DICTOKEY = [
+      'stop typing start speaking 52 languages',
+      'I dictate 100 words in 8 seconds watch',
+      'this keyboard types FOR you with AI',
+      'voice keyboard that translates instantly',
+      'why are you still typing in 2026',
+      'dictate in French get text in English',
+      'AI corrects your dictation automatically',
+      'reply to messages 5x faster with voice',
+      'WhatsApp vocal to text in one tap',
+      'the keyboard trick nobody knows on Android',
+    ];
+
+    const PROMO_HOOKS_DICTOKEY_FR = [
+      'arretez de taper dictez 52 langues',
+      'je dicte 100 mots en 8 secondes regardez',
+      'ce clavier tape A VOTRE PLACE avec IA',
+      'clavier vocal qui traduit instantanement',
+      'pourquoi vous tapez encore en 2026',
+      'je parle francais ca ecrit en anglais',
+      'IA corrige votre dictee automatiquement',
+      'repondez 5x plus vite avec la voix',
+      'vocal WhatsApp en texte en un tap',
+      'lastuce clavier que personne connait',
+    ];
+
+    const PROMO_HOOKS_SWP = [
+      'subtitle any video in 2 minutes AI powered',
+      'VEED costs 24 dollars this does the same for 9',
+      'your TikTok needs subtitles or you lose 80 percent',
+      'translate subtitles in 75 languages automatically',
+      'AI fixes Whisper hallucinations automatically',
+    ];
+
+    const PROMO_HOOKS_SWP_FR = [
+      'sous-titrez nimporte quelle video en 2 min',
+      'VEED coute 24 dollars ca fait pareil pour 9',
+      'sans sous-titres tu perds 80 pourcent daudience',
+      'traduisez vos sous-titres en 75 langues auto',
+      'IA corrige les hallucinations Whisper',
+    ];
+
+    const PROMO_MODES = ['pip', 'slide'];
+
+    function generatePromoCmd(group, dayIso, configIdx) {
+      // Determine language from group/account name
+      const groupLower = (group || '').toLowerCase();
+      const isFR = groupLower.includes('news.ai') || groupLower.includes('bruce li');
+      const lang = isFR ? 'fr' : 'en';
+
+      // Seed based on date + index for deterministic but varied rotation
+      const dateSeed = dayIso ? parseInt(dayIso.replace(/-/g, ''), 10) : 0;
+      const seed = dateSeed + configIdx;
+
+      // Product: 70% DictoKey, 30% SubWhisper Pro
+      const productRoll = seed % 10;
+      const isDictoKey = productRoll < 7;
+
+      // Mode rotation
+      const mode = PROMO_MODES[seed % PROMO_MODES.length];
+
+      // Hook selection
+      let hook;
+      if (isDictoKey) {
+        const pool = isFR ? PROMO_HOOKS_DICTOKEY_FR : PROMO_HOOKS_DICTOKEY;
+        hook = pool[seed % pool.length];
+      } else {
+        const pool = isFR ? PROMO_HOOKS_SWP_FR : PROMO_HOOKS_SWP;
+        hook = pool[seed % pool.length];
+      }
+
+      const product = isDictoKey ? 'DictoKey' : 'SubWhisper';
+      return '/promo ' + mode + ' ' + lang + ' ' + product + ' ' + hook;
     }
 
     function renderWeekView() {
@@ -2657,7 +2744,7 @@
           daysHtml += `<div class="week-section-label">Videos (${allVideoCount})</div>`;
 
           // Videos provenant de Config (plateformes video)
-          dayVideoTasks.forEach(t => {
+          dayVideoTasks.forEach((t, configIdx) => {
             const platformKey = (t.platform).toLowerCase();
             const icon = PLATFORM_ICONS[platformKey] || '🎬';
             const matchedPlan = dayPlanning.find(p => (p.platform || '').toLowerCase() === platformKey && (p.group || '').toLowerCase() === (t.group || '').toLowerCase());
@@ -2667,6 +2754,8 @@
             const isNextAction = day.isToday && !isDone && !isSkipped && !firstNextActionSet && !nextActionForDay;
             if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
 
+            const promoCmd = generatePromoCmd(t.group, day.isoStr, configIdx);
+
             daysHtml += `
               <div class="week-rich-card type-video ${statusClass}${isNextAction ? ' is-next-action' : ''}">
                 <div class="card-top">
@@ -2674,10 +2763,12 @@
                   <div class="card-info">
                     <div class="card-platform-name">${escHtml(t.platform)}${isNextAction ? '<span class="next-action-badge">A faire</span>' : ''}</div>
                     <div class="card-group">📍 ${escHtml(t.group)}</div>
+                    <div class="card-article" style="font-family:monospace;font-size:0.72rem;color:var(--accent-light);margin-top:4px;">${escHtml(promoCmd)}</div>
                     ${PLATFORM_BEST_TIME[platformKey] ? `<div class="card-best-time">🕐 ${PLATFORM_BEST_TIME[platformKey]}</div>` : ''}
                   </div>
                 </div>
                 <div class="card-actions">
+                  <button class="btn btn-copy" data-copytxt="${escHtml(promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
                   ${day.isToday && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
                 </div>
@@ -2763,6 +2854,58 @@
     }
 
     // ============================================================
+    // AUTO-LANCEMENT PROMO (19h Paris)
+    // ============================================================
+    let autoPromoEnabled = false;
+
+    async function loadAutoPromoStatus() {
+      if (!API_URL) return;
+      try {
+        const res = await fetch(`${API_URL}?action=autoPromoStatus`, { redirect: 'follow' });
+        const data = await res.json();
+        autoPromoEnabled = data.enabled || false;
+        updateAutoPromoBtn();
+      } catch (err) {
+        console.error('loadAutoPromoStatus error:', err);
+      }
+    }
+
+    function updateAutoPromoBtn() {
+      const btn = document.getElementById('autoPromoBtn');
+      if (!btn) return;
+      if (autoPromoEnabled) {
+        btn.textContent = '▶ Auto 19h ON';
+        btn.style.background = 'rgba(16,185,129,0.2)';
+        btn.style.borderColor = 'var(--success)';
+        btn.style.color = 'var(--success)';
+      } else {
+        btn.textContent = '⏸ Auto 19h OFF';
+        btn.style.background = 'rgba(16,185,129,0.08)';
+        btn.style.borderColor = 'rgba(16,185,129,0.3)';
+        btn.style.color = 'var(--text-muted)';
+      }
+    }
+
+    async function toggleAutoPromo() {
+      if (!API_URL) { showToast('API non configuree', 'error'); return; }
+      autoPromoEnabled = !autoPromoEnabled;
+      updateAutoPromoBtn();
+      showToast(autoPromoEnabled ? '▶ Auto-lancement activé (19h Paris)' : '⏸ Auto-lancement désactivé', autoPromoEnabled ? 'success' : 'warning', 2500);
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'toggleAutoPromo', enabled: autoPromoEnabled }),
+          redirect: 'follow',
+        });
+      } catch (err) {
+        console.error('toggleAutoPromo error:', err);
+        showToast('Erreur sync auto-promo', 'error');
+      }
+    }
+
+    // ============================================================
     // VEILLE IA — Trending promo angles
     // ============================================================
     async function fetchTrendingAngles() {
@@ -2823,11 +2966,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
-      // v2.2.0 : vue semaine = ecran principal
+      // v2.3.0 : vue semaine = ecran principal
       weekOffset = 0;
       loadWeekView().then(updateRefreshTime);
       fetchConfig();
       fetchStats();
+      loadAutoPromoStatus();
       // Restore last generate timestamp
       const lastGen = localStorage.getItem('promo-lastGenerate');
       if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
