@@ -2434,7 +2434,7 @@
 
         weekConfigCache = (configRes.config || []).filter(g => g.active);
         weekVideosCache = videosRes.videos || [];
-        weekPlanningCache = planningRes.planning || [];
+        weekPlanningCache = Array.isArray(planningRes.planning) ? planningRes.planning : [];
 
         renderWeekView();
       } catch (err) {
@@ -2680,6 +2680,8 @@
         weekTotalVideos += allVideoCount;
         weekDone += progressDone;
 
+        const totalCount = dayTextes.length + allVideoCount;
+
         // Stats du jour courant pour la barre du bas
         if (day.isToday) {
           todayStats.total = totalCount;
@@ -2687,8 +2689,6 @@
           todayStats.skipped = skippedCount;
           todayStats.pending = Math.max(0, totalCount - doneCount - skippedCount);
         }
-
-        const totalCount = dayTextes.length + allVideoCount;
         let nextActionForDay = false;
 
         daysHtml += `<div class="week-day-column">`;
@@ -2730,7 +2730,7 @@
 
             // Store data for copy/open — utiliser le texte resolu du post (pas le slug)
             const wkey = 'wt-' + day.isoStr + '-' + t._row;
-            const resolvedText = matchedPlan && matchedPlan.textes && matchedPlan.textes.length > 0 ? matchedPlan.textes[0].resolved : '';
+            const resolvedText = (matchedPlan && matchedPlan.textes && matchedPlan.textes.length > 0 && matchedPlan.textes[0]) ? (matchedPlan.textes[0].resolved || '') : '';
             const copyTxt = resolvedText || articleTitle || t.group;
             window._weekCopyData[wkey] = copyTxt;
 
