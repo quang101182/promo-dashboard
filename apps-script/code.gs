@@ -1769,3 +1769,81 @@ function callGemini(endpoint, prompt) {
     return { ok: false, error: e.toString() };
   }
 }
+
+// ── MIGRATION : corriger les noms de groupes dans le Sheet existant ──
+// Lancer UNE FOIS depuis l'editeur Apps Script (bouton ▶)
+// Peut etre supprime apres execution
+
+function fixGroupNames() {
+  var RENAMES = {
+    'NO CODE APP Builder': 'Bubble.io (Certified Bubble Developers) & No-Code Developers',
+    'n8n Hub': 'n8n Hub - Workflows, Templates, AI Automations',
+    'AI for Everyone': 'AI for Everyone: No-Code AI & Learning Hub'
+  };
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var log = [];
+
+  // --- 1. Config sheet : renommer + supprimer doublons ---
+  var cfgSheet = ss.getSheetByName(SHEET_NAME_CONFIG);
+  var cfgData = cfgSheet.getDataRange().getValues();
+  var seen = {};
+  var rowsToDelete = [];
+
+  for (var i = 1; i < cfgData.length; i++) {
+    var platform = cfgData[i][0] || '';
+    var group = cfgData[i][1] || '';
+
+    // Renommer si ancien nom
+    if (RENAMES[group]) {
+      var newName = RENAMES[group];
+      cfgSheet.getRange(i + 1, 2).setValue(newName);
+      log.push('Config ligne ' + (i + 1) + ': "' + group + '" -> "' + newName + '"');
+      group = newName;
+    }
+
+    // Detecter doublons (meme platform||group)
+    var key = platform + '||' + group;
+    if (seen[key]) {
+      rowsToDelete.push(i + 1); // 1-indexed
+      log.push('Config doublon ligne ' + (i + 1) + ': ' + key);
+    } else {
+      seen[key] = true;
+    }
+  }
+
+  // Supprimer doublons du bas vers le haut (pour ne pas decaler les indices)
+  for (var d = rowsToDelete.length - 1; d >= 0; d--) {
+    cfgSheet.deleteRow(rowsToDelete[d]);
+  }
+
+  // --- 2. Planning sheet : renommer les groupes ---
+  var planSheet = ss.getSheetByName(SHEET_NAME_PLANNING);
+  var planData = planSheet.getDataRange().getValues();
+  var planHeaders = planData[0];
+  var groupCol = -1;
+  for (var h = 0; h < planHeaders.length; h++) {
+    if (String(planHeaders[h]).toLowerCase() === 'group') { groupCol = h; break; }
+  }
+
+  if (groupCol >= 0) {
+    for (var p = 1; p < planData.length; p++) {
+      var pGroup = planData[p][groupCol] || '';
+      if (RENAMES[pGroup]) {
+        planSheet.getRange(p + 1, groupCol + 1).setValue(RENAMES[pGroup]);
+        log.push('Planning ligne ' + (p + 1) + ': "' + pGroup + '" -> "' + RENAMES[pGroup] + '"');
+      }
+    }
+  }
+
+  // --- 3. Textes sheet : renommer si utilise ---
+  var txtSheet = ss.getSheetByName('Textes');
+  if (txtSheet) {
+    var txtData = txtSheet.getDataRange().getValues();
+    // Pas de colonne group dans Textes, skip
+  }
+
+  Logger.log('fixGroupNames termine. ' + log.length + ' modifications.');
+  Logger.log(log.join('\n'));
+  return { ok: true, changes: log.length, details: log };
+}
