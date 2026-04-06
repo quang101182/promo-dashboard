@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.0.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.1.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.0.0</title>
+  <title>Promo Dashboard v2.1.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -991,6 +991,108 @@
     .week-video-compact.is-today-card { border-left-width: 4px; }
     .week-video-compact.is-past-card { opacity: 0.45; }
 
+    /* ===== WEEK RICH CARDS v2.1 ===== */
+    .week-rich-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-card);
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+    }
+    .week-rich-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+    .week-rich-card.type-video {
+      border-left-color: var(--accent);
+    }
+    .week-rich-card.type-texte {
+      border-left-color: var(--primary);
+    }
+    .week-rich-card.is-done {
+      opacity: 0.5;
+      background: rgba(16, 185, 129, 0.06);
+      border-left-color: var(--success);
+    }
+    .week-rich-card.is-done .card-article,
+    .week-rich-card.is-done .card-group {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .week-rich-card.is-skipped {
+      opacity: 0.4;
+    }
+    .week-rich-card.is-next-action {
+      border-left-width: 5px;
+      box-shadow: 0 0 0 1px var(--primary-light), var(--shadow-sm);
+    }
+    .week-rich-card.is-next-action.type-video {
+      box-shadow: 0 0 0 1px var(--accent-light), var(--shadow-sm);
+    }
+    .next-action-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* Week summary */
+    .week-summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    .week-summary-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .week-summary-num {
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    /* Collapsible days */
+    .week-day-header {
+      cursor: pointer;
+      user-select: none;
+    }
+    .week-day-header .collapse-arrow {
+      font-size: 0.7rem;
+      margin-right: 6px;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+    .week-day-header.collapsed .collapse-arrow {
+      transform: rotate(-90deg);
+    }
+    .week-day-body {
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.2s ease;
+      max-height: 2000px;
+      opacity: 1;
+    }
+    .week-day-body.collapsed {
+      max-height: 0;
+      opacity: 0;
+    }
+
     /* ===== WEEK NAV ===== */
     .week-nav {
       display: flex;
@@ -1242,7 +1344,7 @@
         </div>
       </div>
 
-      <div class="footer">v2.0.0 — Promo Dashboard</div>
+      <div class="footer">v2.1.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1354,7 +1456,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.0.0 — Promo Dashboard</div>
+      <div class="footer">v2.1.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1397,7 +1499,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '2.0.0';
+    const VERSION = '2.1.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -2341,7 +2443,7 @@
     }
 
     // ============================================================
-    // WEEK VIEW — v2.0.0 avec navigation + progress bars
+    // WEEK VIEW — v2.1.0 avec navigation + progress bars
     // ============================================================
     let weekViewActive = false;
     let weekConfigCache = null;
@@ -2469,6 +2571,23 @@
       return false;
     }
 
+    // Helpers pour normaliser les dates
+    function normalizeDateStr(d) {
+      if (!d) return '';
+      let s = String(d);
+      if (s.includes('/')) {
+        const parts = s.split('/');
+        if (parts.length === 3) s = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+      }
+      return s;
+    }
+
+    // Determiner si une plateforme est "video" (TikTok, Instagram, YouTube)
+    const VIDEO_PLATFORMS = ['tiktok', 'instagram', 'youtube'];
+    function isVideoPlatform(platform) {
+      return VIDEO_PLATFORMS.includes((platform || '').toLowerCase());
+    }
+
     function renderWeekView() {
       const content = document.getElementById('weekContent');
       const days = getWeekDays(weekOffset);
@@ -2476,123 +2595,214 @@
       const videos = weekVideosCache || [];
       const planning = weekPlanningCache || [];
 
-      let html = '';
+      // --- Calcul resume semaine ---
+      let weekTotalTextes = 0, weekTotalVideos = 0, weekDone = 0;
+
+      // --- Generer le HTML jour par jour ---
+      let daysHtml = '';
+      let firstNextActionSet = false;
 
       days.forEach(day => {
         const headerClass = day.isToday ? 'week-day-header is-today' : day.isPast ? 'week-day-header is-past' : 'week-day-header';
-        const cardMod = day.isToday ? 'is-today-card' : day.isPast ? 'is-past-card' : '';
+        // Jours plies par defaut sauf aujourd'hui
+        const isCollapsed = !day.isToday;
 
-        // Taches texte prevues pour ce jour (basees sur config + frequence)
-        const dayTasks = [];
+        // Taches config pour ce jour, separees en textes et videos
+        const dayTextes = [];
+        const dayVideoTasks = [];
         config.forEach((g, idx) => {
           const freq = (g.frequency || 'weekly').toLowerCase();
           if (shouldPostOnDay(freq, idx, day.dowIndex)) {
-            dayTasks.push({
+            const task = {
               platform: g.platform || '',
               group: g.group || g.name || g.groupe || '',
               frequency: freq,
               type: g.type || 'texte',
-            });
+              url: g.url || '',
+              _row: g._row || g.row || 0,
+            };
+            if (isVideoPlatform(task.platform)) {
+              dayVideoTasks.push(task);
+            } else {
+              dayTextes.push(task);
+            }
           }
         });
 
-        // Planning reel pour ce jour (statuts done/pending/skipped)
-        const dayPlanning = planning.filter(p => {
-          if (!p.date) return false;
-          let pDate = String(p.date);
-          if (pDate.includes('/')) {
-            const parts = pDate.split('/');
-            if (parts.length === 3) pDate = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
-          }
-          return pDate === day.isoStr;
-        });
+        // Planning reel pour ce jour
+        const dayPlanning = planning.filter(p => normalizeDateStr(p.date) === day.isoStr);
 
-        // Calcul progress
-        const totalPlanned = dayPlanning.length || dayTasks.length;
+        // Videos du Contenu sheet pour ce jour
+        const dayVideos = videos.filter(v => normalizeDateStr(v.date) === day.isoStr);
+
+        // Tous les items video = video tasks (config) + videos planifiees (Contenu)
+        const allVideoCount = dayVideoTasks.length + dayVideos.length;
+
+        // Progress
+        const totalPlanned = dayPlanning.length || (dayTextes.length + dayVideoTasks.length);
         const doneCount = dayPlanning.filter(p => p.status === 'done').length;
         const skippedCount = dayPlanning.filter(p => p.status === 'skipped').length;
-        const progressPct = totalPlanned > 0 ? Math.round(((doneCount + skippedCount) / totalPlanned) * 100) : 0;
+        const videoDone = dayVideos.filter(v => (v.statut || '').toLowerCase() === 'publie').length;
+        const progressTotal = totalPlanned + dayVideos.length;
+        const progressDone = doneCount + skippedCount + videoDone;
+        const progressPct = progressTotal > 0 ? Math.round((progressDone / progressTotal) * 100) : 0;
         const progressClass = progressPct >= 100 ? 'done' : 'partial';
 
-        // Videos pour ce jour
-        const dayVideos = videos.filter(v => {
-          if (!v.date) return false;
-          let vDate = String(v.date);
-          if (vDate.includes('/')) {
-            const parts = vDate.split('/');
-            if (parts.length === 3) vDate = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
-          }
-          return vDate === day.isoStr;
-        });
+        // Stats semaine
+        weekTotalTextes += dayTextes.length;
+        weekTotalVideos += allVideoCount;
+        weekDone += progressDone;
 
-        const totalCount = dayTasks.length + dayVideos.length;
+        const totalCount = dayTextes.length + allVideoCount;
+        let nextActionForDay = false;
 
-        html += `<div class="week-day-column">`;
-        html += `<div class="${headerClass}">
-          <span>${day.name} <span class="week-day-date">${day.dateStr}</span></span>
+        daysHtml += `<div class="week-day-column">`;
+        daysHtml += `<div class="${headerClass}${isCollapsed ? ' collapsed' : ''}" onclick="toggleDayCollapse(this)">
+          <span><span class="collapse-arrow">▼</span>${day.name} <span class="week-day-date">${day.dateStr}</span></span>
           <span class="week-day-count">${totalCount}</span>
         </div>`;
 
-        // Barre de progression (si planning reel existe)
-        if (dayPlanning.length > 0) {
-          html += `<div class="week-progress-wrap">
+        daysHtml += `<div class="week-day-body${isCollapsed ? ' collapsed' : ''}">`;
+
+        // Barre de progression
+        if (progressTotal > 0) {
+          daysHtml += `<div class="week-progress-wrap">
             <div class="week-progress-bar">
               <div class="week-progress-fill ${progressClass}" style="width:${progressPct}%"></div>
             </div>
-            <span class="week-progress-text">${doneCount}/${totalPlanned}</span>
+            <span class="week-progress-text">${progressDone}/${progressTotal}</span>
           </div>`;
         }
 
-        if (dayTasks.length === 0 && dayVideos.length === 0) {
-          html += `<div class="week-empty-day">Aucune tache prevue</div>`;
+        if (totalCount === 0) {
+          daysHtml += `<div class="week-empty-day">Aucune tache prevue</div>`;
         }
 
-        // Taches texte
-        if (dayTasks.length > 0) {
-          html += `<div class="week-section-label">Textes (${dayTasks.length})</div>`;
-          dayTasks.forEach(t => {
+        // --- Section TEXTES ---
+        if (dayTextes.length > 0) {
+          daysHtml += `<div class="week-section-label">Textes (${dayTextes.length})</div>`;
+          dayTextes.forEach(t => {
             const platformKey = (t.platform).toLowerCase();
             const icon = PLATFORM_ICONS[platformKey] || '🔗';
-            // Verifier dans le planning reel si cette tache est done
             const matchedPlan = dayPlanning.find(p => (p.platform || '').toLowerCase() === platformKey && (p.group || '').toLowerCase() === (t.group || '').toLowerCase());
             const isDone = matchedPlan && matchedPlan.status === 'done';
             const isSkipped = matchedPlan && matchedPlan.status === 'skipped';
-            const statusBadge = isDone ? ' <span style="color:var(--success);font-size:0.7rem;">✅</span>' : isSkipped ? ' <span style="color:var(--text-muted);font-size:0.7rem;">⏭</span>' : '';
-            html += `<div class="week-card-compact ${cardMod}" ${isDone ? 'style="opacity:0.6"' : ''}>
-              <span class="week-card-icon">${icon}</span>
-              <div class="week-card-body">
-                <div class="week-card-group">${escHtml(t.group)}${statusBadge}</div>
-                <div class="week-card-detail">${escHtml(t.platform)}</div>
-              </div>
-              <span class="week-card-freq">${escHtml(t.frequency)}</span>
-            </div>`;
+            const articleTitle = matchedPlan ? (matchedPlan.article || '') : '';
+            const statusClass = isDone ? 'is-done' : isSkipped ? 'is-skipped' : '';
+            // Next action badge : premiere tache non-done du jour courant
+            const isNextAction = day.isToday && !isDone && !isSkipped && !firstNextActionSet && !nextActionForDay;
+            if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
+
+            // Store data for copy/open
+            const wkey = 'wt-' + day.isoStr + '-' + t._row;
+            const copyTxt = articleTitle || t.group;
+
+            daysHtml += `
+              <div class="week-rich-card type-texte ${statusClass}${isNextAction ? ' is-next-action' : ''}">
+                <div class="card-top">
+                  <div class="card-platform-icon">${icon}</div>
+                  <div class="card-info">
+                    <div class="card-platform-name">${escHtml(t.platform)}${isNextAction ? '<span class="next-action-badge">A faire</span>' : ''}</div>
+                    ${articleTitle ? `<div class="card-article">${escHtml(articleTitle)}</div>` : ''}
+                    <div class="card-group">📍 ${escHtml(t.group)}</div>
+                    ${PLATFORM_BEST_TIME[platformKey] ? `<div class="card-best-time">🕐 ${PLATFORM_BEST_TIME[platformKey]}</div>` : ''}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-copy" data-copytxt="${escHtml(copyTxt)}" onclick="copyText(this.dataset.copytxt)">📋 Copier</button>
+                  ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
+                </div>
+              </div>`;
           });
         }
 
-        // Videos
-        if (dayVideos.length > 0) {
-          html += `<div class="week-section-label">Videos (${dayVideos.length})</div>`;
+        // --- Section VIDEOS ---
+        if (allVideoCount > 0) {
+          daysHtml += `<div class="week-section-label">Videos (${allVideoCount})</div>`;
+
+          // Videos provenant de Config (plateformes video)
+          dayVideoTasks.forEach(t => {
+            const platformKey = (t.platform).toLowerCase();
+            const icon = PLATFORM_ICONS[platformKey] || '🎬';
+            const matchedPlan = dayPlanning.find(p => (p.platform || '').toLowerCase() === platformKey && (p.group || '').toLowerCase() === (t.group || '').toLowerCase());
+            const isDone = matchedPlan && matchedPlan.status === 'done';
+            const isSkipped = matchedPlan && matchedPlan.status === 'skipped';
+            const statusClass = isDone ? 'is-done' : isSkipped ? 'is-skipped' : '';
+            const isNextAction = day.isToday && !isDone && !isSkipped && !firstNextActionSet && !nextActionForDay;
+            if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
+
+            daysHtml += `
+              <div class="week-rich-card type-video ${statusClass}${isNextAction ? ' is-next-action' : ''}">
+                <div class="card-top">
+                  <div class="card-platform-icon">${icon}</div>
+                  <div class="card-info">
+                    <div class="card-platform-name">${escHtml(t.platform)}${isNextAction ? '<span class="next-action-badge">A faire</span>' : ''}</div>
+                    <div class="card-group">📍 ${escHtml(t.group)}</div>
+                    ${PLATFORM_BEST_TIME[platformKey] ? `<div class="card-best-time">🕐 ${PLATFORM_BEST_TIME[platformKey]}</div>` : ''}
+                  </div>
+                </div>
+                <div class="card-actions">
+                  ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
+                </div>
+              </div>`;
+          });
+
+          // Videos provenant du Contenu sheet (planifiees)
           dayVideos.forEach(v => {
             const platformKey = (v.plateforme || '').toLowerCase();
             const icon = PLATFORM_ICONS[platformKey] || '🎬';
-            const hook = (v.hook || 'Sans hook').substring(0, 50);
             const vStatus = (v.statut || '').toLowerCase();
             const vDone = vStatus === 'publie';
-            const vBadge = vDone ? ' <span style="color:var(--success);font-size:0.7rem;">✅</span>' : '';
-            html += `<div class="week-video-compact ${cardMod}" ${vDone ? 'style="opacity:0.6"' : ''}>
-              <span class="week-card-icon">${icon}</span>
-              <div class="week-card-body">
-                <div class="week-card-group">${escHtml(hook)}${vBadge}</div>
-                <div class="week-card-detail">${escHtml(v.plateforme || '')} · ${escHtml(v.compte || '')}</div>
-              </div>
-            </div>`;
+            const statusClass = vDone ? 'is-done' : '';
+            const langClass = (v.langue || '').toUpperCase() === 'FR' ? 'video-lang-fr' : 'video-lang-en';
+            const langLabel = (v.langue || 'EN').toUpperCase();
+            const isNextAction = day.isToday && !vDone && !firstNextActionSet && !nextActionForDay;
+            if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
+
+            daysHtml += `
+              <div class="week-rich-card type-video ${statusClass}${isNextAction ? ' is-next-action' : ''}">
+                <div class="card-top">
+                  <div class="card-platform-icon">${icon}</div>
+                  <div class="card-info">
+                    <div class="card-platform-name">${escHtml(v.plateforme || '')} · ${escHtml(v.compte || '')}${isNextAction ? '<span class="next-action-badge">A faire</span>' : ''}</div>
+                    <div class="card-article">${escHtml(v.hook || 'Sans hook')}</div>
+                    <div class="video-meta" style="margin-top:4px;">
+                      <span class="video-meta-badge ${langClass}">${langLabel}</span>
+                      ${v.produit ? `<span class="video-meta-badge video-product">${escHtml(v.produit)}</span>` : ''}
+                      ${v.type ? `<span class="video-meta-badge video-type-badge">${escHtml(v.type)}</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  ${v.promoCmd ? `<button class="btn btn-copy" data-copytxt="${escHtml(v.promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>` : ''}
+                </div>
+              </div>`;
           });
         }
 
-        html += `</div>`;
+        daysHtml += `</div>`; // /week-day-body
+        daysHtml += `</div>`; // /week-day-column
       });
 
-      content.innerHTML = html;
+      // --- Resume semaine ---
+      const weekTotal = weekTotalTextes + weekTotalVideos;
+      let summaryHtml = `<div class="week-summary">
+        <div class="week-summary-item"><span class="week-summary-num">${weekTotal}</span> taches</div>
+        <div class="week-summary-item">✅ <span class="week-summary-num">${weekDone}</span> faites</div>
+        <div class="week-summary-item" style="color:var(--primary-light)">📝 <span class="week-summary-num">${weekTotalTextes}</span> textes</div>
+        <div class="week-summary-item" style="color:var(--accent-light)">🎬 <span class="week-summary-num">${weekTotalVideos}</span> videos</div>
+      </div>`;
+
+      content.innerHTML = summaryHtml + daysHtml;
+    }
+
+    // Toggle jour plie/deplie
+    function toggleDayCollapse(headerEl) {
+      headerEl.classList.toggle('collapsed');
+      const body = headerEl.nextElementSibling;
+      if (body && body.classList.contains('week-day-body')) {
+        body.classList.toggle('collapsed');
+      }
     }
 
     // ============================================================
