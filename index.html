@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.7.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.8.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.7.0</title>
+  <title>Promo Dashboard v1.8.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -820,6 +820,177 @@
     }
     .btn-perf-cancel:hover { background: var(--text-muted); color: var(--text); }
 
+    /* ===== WEEK VIEW ===== */
+    .week-toggle-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+      gap: 8px;
+    }
+
+    .btn-week-toggle {
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-btn);
+      border: 1px solid var(--primary-dark);
+      background: rgba(124, 58, 237, 0.12);
+      color: var(--primary-light);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-week-toggle:hover { background: rgba(124, 58, 237, 0.25); }
+    .btn-week-toggle:active { transform: scale(0.95); }
+
+    .week-view { display: none; }
+    .week-view.active { display: block; }
+    .today-view { display: block; }
+    .today-view.hidden { display: none; }
+
+    .week-day-column {
+      margin-bottom: 20px;
+    }
+
+    .week-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .week-day-header.is-today {
+      border-color: var(--accent);
+      background: rgba(6, 182, 212, 0.08);
+      color: var(--accent-light);
+    }
+    .week-day-header.is-past {
+      opacity: 0.5;
+    }
+
+    .week-day-date {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .week-day-header.is-today .week-day-date {
+      color: var(--accent);
+    }
+
+    .week-day-count {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--border);
+      color: var(--text-muted);
+    }
+    .week-day-header.is-today .week-day-count {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--accent-light);
+    }
+
+    .week-card-compact {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      padding: 8px 12px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      transition: all var(--transition);
+    }
+    .week-card-compact:hover { border-color: var(--primary-light); }
+
+    .week-card-compact.is-today-card {
+      border-left: 3px solid var(--accent);
+    }
+
+    .week-card-compact.is-past-card {
+      opacity: 0.45;
+    }
+
+    .week-card-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .week-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .week-card-group {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .week-card-detail {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .week-card-freq {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--border);
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .week-section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 6px 0 4px 4px;
+    }
+
+    .week-empty-day {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-style: italic;
+    }
+
+    .week-video-compact {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-btn);
+      padding: 8px 12px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      transition: all var(--transition);
+    }
+    .week-video-compact:hover { border-color: var(--accent-light); }
+    .week-video-compact.is-today-card { border-left-width: 4px; }
+    .week-video-compact.is-past-card { opacity: 0.45; }
+
     /* ===== RESPONSIVE 768px+ ===== */
     @media (min-width: 768px) {
       .container { padding: 20px 24px; }
@@ -860,6 +1031,14 @@
   <div class="tab-panel active" id="panel-today">
     <div class="container">
 
+      <!-- Toggle Aujourd'hui / Semaine -->
+      <div class="week-toggle-bar">
+        <button class="btn-week-toggle" id="weekToggleBtn" onclick="toggleWeekView()">📅 Semaine</button>
+      </div>
+
+      <!-- VUE AUJOURD'HUI (par defaut) -->
+      <div class="today-view" id="todayView">
+
       <!-- Section TEXTES -->
       <div class="section-group">
         <div class="section-header">
@@ -890,7 +1069,19 @@
         </div>
       </div>
 
-      <div class="footer">v1.7.0 — Promo Dashboard</div>
+      </div><!-- /todayView -->
+
+      <!-- VUE SEMAINE -->
+      <div class="week-view" id="weekView">
+        <div id="weekContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">📅</div>
+            <div class="empty-state-title">Chargement de la semaine...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">v1.8.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -980,7 +1171,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.7.0 — Promo Dashboard</div>
+      <div class="footer">v1.8.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1023,7 +1214,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.7.0';
+    const VERSION = '1.8.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1931,6 +2122,199 @@
         btn.disabled = false;
         btn.textContent = 'Enregistrer';
       }
+    }
+
+    // ============================================================
+    // WEEK VIEW
+    // ============================================================
+    let weekViewActive = false;
+    let weekConfigCache = null;
+    let weekVideosCache = null;
+
+    function toggleWeekView() {
+      weekViewActive = !weekViewActive;
+      const btn = document.getElementById('weekToggleBtn');
+      const todayView = document.getElementById('todayView');
+      const weekView = document.getElementById('weekView');
+
+      if (weekViewActive) {
+        btn.innerHTML = '📋 Aujourd\'hui';
+        todayView.classList.add('hidden');
+        weekView.classList.add('active');
+        loadWeekView();
+      } else {
+        btn.innerHTML = '📅 Semaine';
+        todayView.classList.remove('hidden');
+        weekView.classList.remove('active');
+      }
+    }
+
+    async function loadWeekView() {
+      const content = document.getElementById('weekContent');
+      content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-title">Chargement...</div></div>';
+
+      try {
+        // Fetch config + allVideos en parallele
+        const [configRes, videosRes] = await Promise.all([
+          fetch(`${API_URL}?action=config`, { redirect: 'follow' }).then(r => r.json()),
+          fetch(`${API_URL}?action=todayVideos`, { redirect: 'follow' }).then(r => r.json()).catch(() => ({ videos: [] })),
+        ]);
+
+        weekConfigCache = (configRes.config || []).filter(g => g.active);
+        weekVideosCache = videosRes.videos || [];
+
+        renderWeekView();
+      } catch (err) {
+        console.error('loadWeekView error:', err);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Erreur chargement semaine</div></div>';
+      }
+    }
+
+    function getWeekDays() {
+      const today = new Date();
+      const dow = today.getDay(); // 0=dim, 1=lun...
+      // Trouver le lundi de cette semaine
+      const monday = new Date(today);
+      const diffToMon = dow === 0 ? -6 : 1 - dow;
+      monday.setDate(today.getDate() + diffToMon);
+      monday.setHours(0, 0, 0, 0);
+
+      const days = [];
+      const dayNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+      for (let i = 0; i < 5; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const todayStr = new Date();
+        todayStr.setHours(0, 0, 0, 0);
+        days.push({
+          name: dayNames[i],
+          date: d,
+          dateStr: d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+          isoStr: d.toISOString().split('T')[0],
+          isToday: d.getTime() === todayStr.getTime(),
+          isPast: d < todayStr,
+          dowIndex: i, // 0=lun, 1=mar, 2=mer, 3=jeu, 4=ven
+        });
+      }
+      return days;
+    }
+
+    function shouldPostOnDay(frequency, configIdx, dowIndex) {
+      // dowIndex: 0=lun, 1=mar, 2=mer, 3=jeu, 4=ven
+      if (frequency === 'daily') return true;
+      if (frequency === 'weekly') {
+        const assignedDay = configIdx % 5; // 0=lun, 1=mar, ...
+        return dowIndex === assignedDay;
+      }
+      if (frequency === '3x-week') {
+        // pair → lun(0)/mer(2)/ven(4), impair → mar(1)/jeu(3)
+        if (configIdx % 2 === 0) {
+          return dowIndex === 0 || dowIndex === 2 || dowIndex === 4;
+        } else {
+          return dowIndex === 1 || dowIndex === 3;
+        }
+      }
+      // 2x-week, etc. → fallback weekly
+      if (frequency === '2x-week') {
+        if (configIdx % 2 === 0) {
+          return dowIndex === 0 || dowIndex === 3; // lun + jeu
+        } else {
+          return dowIndex === 1 || dowIndex === 4; // mar + ven
+        }
+      }
+      return false;
+    }
+
+    function renderWeekView() {
+      const content = document.getElementById('weekContent');
+      const days = getWeekDays();
+      const config = weekConfigCache || [];
+      const videos = weekVideosCache || [];
+
+      let html = '';
+
+      days.forEach(day => {
+        const headerClass = day.isToday ? 'week-day-header is-today' : day.isPast ? 'week-day-header is-past' : 'week-day-header';
+        const cardMod = day.isToday ? 'is-today-card' : day.isPast ? 'is-past-card' : '';
+
+        // Calculer les taches texte pour ce jour
+        const dayTasks = [];
+        config.forEach((g, idx) => {
+          const freq = (g.frequency || 'weekly').toLowerCase();
+          if (shouldPostOnDay(freq, idx, day.dowIndex)) {
+            dayTasks.push({
+              platform: g.platform || '',
+              group: g.group || g.name || g.groupe || '',
+              frequency: freq,
+              type: g.type || 'texte',
+            });
+          }
+        });
+
+        // Filtrer les videos pour ce jour (par date)
+        const dayVideos = videos.filter(v => {
+          if (!v.date) return false;
+          // Normaliser la date (peut etre DD/MM/YYYY ou YYYY-MM-DD)
+          let vDate = v.date;
+          if (vDate.includes('/')) {
+            const parts = vDate.split('/');
+            if (parts.length === 3) {
+              vDate = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+            }
+          }
+          return vDate === day.isoStr;
+        });
+
+        const totalCount = dayTasks.length + dayVideos.length;
+
+        html += `<div class="week-day-column">`;
+        html += `<div class="${headerClass}">
+          <span>${day.name} <span class="week-day-date">${day.dateStr}</span></span>
+          <span class="week-day-count">${totalCount}</span>
+        </div>`;
+
+        if (dayTasks.length === 0 && dayVideos.length === 0) {
+          html += `<div class="week-empty-day">Aucune tache prevue</div>`;
+        }
+
+        // Taches texte
+        if (dayTasks.length > 0) {
+          html += `<div class="week-section-label">Textes (${dayTasks.length})</div>`;
+          dayTasks.forEach(t => {
+            const platformKey = (t.platform).toLowerCase();
+            const icon = PLATFORM_ICONS[platformKey] || '🔗';
+            html += `<div class="week-card-compact ${cardMod}">
+              <span class="week-card-icon">${icon}</span>
+              <div class="week-card-body">
+                <div class="week-card-group">${escHtml(t.group)}</div>
+                <div class="week-card-detail">${escHtml(t.platform)}</div>
+              </div>
+              <span class="week-card-freq">${escHtml(t.frequency)}</span>
+            </div>`;
+          });
+        }
+
+        // Videos
+        if (dayVideos.length > 0) {
+          html += `<div class="week-section-label">Videos (${dayVideos.length})</div>`;
+          dayVideos.forEach(v => {
+            const platformKey = (v.plateforme || '').toLowerCase();
+            const icon = PLATFORM_ICONS[platformKey] || '🎬';
+            const hook = (v.hook || 'Sans hook').substring(0, 50);
+            html += `<div class="week-video-compact ${cardMod}">
+              <span class="week-card-icon">${icon}</span>
+              <div class="week-card-body">
+                <div class="week-card-group">${escHtml(hook)}</div>
+                <div class="week-card-detail">${escHtml(v.plateforme || '')} · ${escHtml(v.compte || '')}</div>
+              </div>
+            </div>`;
+          });
+        }
+
+        html += `</div>`;
+      });
+
+      content.innerHTML = html;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
