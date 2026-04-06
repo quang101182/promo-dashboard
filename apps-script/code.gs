@@ -97,6 +97,9 @@ function doGet(e) {
       case 'listFolder':
         result = listDriveFolder(e && e.parameter ? e.parameter.folderId : '');
         break;
+      case 'downloadFile':
+        result = downloadDriveFile(e && e.parameter ? e.parameter.fileId : '');
+        break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
     }
@@ -2016,5 +2019,26 @@ function listDriveFolder(folderId) {
     return { ok: true, files: result, folder: folder.getName() };
   } catch (e) {
     return { ok: false, error: 'Dossier introuvable : ' + e.toString() };
+  }
+}
+
+// ── ACTION : downloadFile (GET) — Télécharger un fichier Drive en base64 ──
+
+function downloadDriveFile(fileId) {
+  if (!fileId) return { ok: false, error: 'fileId requis' };
+
+  try {
+    var file = DriveApp.getFileById(fileId);
+    var blob = file.getBlob();
+    var base64 = Utilities.base64Encode(blob.getBytes());
+    return {
+      ok: true,
+      base64: base64,
+      mimeType: blob.getContentType(),
+      name: file.getName(),
+      size: blob.getBytes().length
+    };
+  } catch (e) {
+    return { ok: false, error: 'Fichier introuvable : ' + e.toString() };
   }
 }
