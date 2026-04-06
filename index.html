@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.1.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.2.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.1.0</title>
+  <title>Promo Dashboard v2.2.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1272,7 +1272,7 @@
 
   <!-- TABS -->
   <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('today')" id="tab-today">Aujourd'hui</button>
+    <button class="tab-btn active" onclick="switchTab('semaine')" id="tab-semaine">Semaine</button>
     <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">Settings</button>
   </nav>
 
@@ -1282,69 +1282,35 @@
     <span>API non configurée. Édite <code>API_URL</code> dans le JS pour connecter ton Apps Script.</span>
   </div>
 
-  <!-- TAB: AUJOURD'HUI -->
-  <div class="tab-panel active" id="panel-today">
+  <!-- TAB: SEMAINE (ecran principal) -->
+  <div class="tab-panel active" id="panel-semaine">
     <div class="container">
 
-      <!-- Toggle Aujourd'hui / Semaine -->
-      <div class="week-toggle-bar">
-        <button class="btn-week-toggle" id="weekToggleBtn" onclick="toggleWeekView()">📅 Semaine</button>
+      <!-- Navigation semaine -->
+      <div class="week-nav">
+        <button class="week-nav-btn" onclick="navigateWeek(-1)">◀ Préc.</button>
+        <div style="text-align:center">
+          <div class="week-nav-label" id="weekNavLabel">Cette semaine</div>
+          <div class="week-nav-sub" id="weekNavSub"></div>
+        </div>
+        <button class="week-nav-btn" onclick="navigateWeek(1)">Suiv. ▶</button>
       </div>
 
-      <!-- VUE AUJOURD'HUI (par defaut) -->
-      <div class="today-view" id="todayView">
-
-      <!-- Section TEXTES -->
-      <div class="section-group">
-        <div class="section-header">
-          <span class="section-title">TEXTES</span>
-          <span class="section-badge" id="manuelCount">0 restants</span>
-        </div>
-        <div id="manuelCards">
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:38%;height:12px"></div>
-            <div class="skeleton-line" style="width:70%;height:14px"></div>
-            <div class="skeleton-line" style="width:48%;height:10px"></div>
-          </div>
-        </div>
+      <!-- Boutons Tout plier / Tout deplier -->
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px;">
+        <button class="btn-week-toggle" onclick="toggleAllDays(false)">▲ Tout plier</button>
+        <button class="btn-week-toggle" onclick="toggleAllDays(true)">▼ Tout déplier</button>
       </div>
 
-      <!-- Section VIDEOS DU JOUR -->
-      <div class="section-group" id="todayVideosSection">
-        <div class="section-header">
-          <span class="section-title">VIDEOS</span>
-          <span class="section-badge" id="videoCount">0</span>
-        </div>
-        <div id="todayVideoCards">
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:35%;height:12px"></div>
-            <div class="skeleton-line" style="width:80%;height:14px"></div>
-            <div class="skeleton-line" style="width:50%;height:10px"></div>
-          </div>
+      <!-- Contenu semaine -->
+      <div id="weekContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">📅</div>
+          <div class="empty-state-title">Chargement de la semaine...</div>
         </div>
       </div>
 
-      </div><!-- /todayView -->
-
-      <!-- VUE SEMAINE -->
-      <div class="week-view" id="weekView">
-        <div class="week-nav">
-          <button class="week-nav-btn" onclick="navigateWeek(-1)">◀ Précédente</button>
-          <div style="text-align:center">
-            <div class="week-nav-label" id="weekNavLabel">Cette semaine</div>
-            <div class="week-nav-sub" id="weekNavSub"></div>
-          </div>
-          <button class="week-nav-btn" onclick="navigateWeek(1)">Suivante ▶</button>
-        </div>
-        <div id="weekContent">
-          <div class="empty-state">
-            <div class="empty-state-icon">📅</div>
-            <div class="empty-state-title">Chargement de la semaine...</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer">v2.1.0 — Promo Dashboard</div>
+      <div class="footer">v2.2.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1456,7 +1422,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.1.0 — Promo Dashboard</div>
+      <div class="footer">v2.2.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1499,7 +1465,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '2.1.0';
+    const VERSION = '2.2.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1845,15 +1811,9 @@
     // MARK DONE
     // ============================================================
     async function markDone(row, platform, group, article) {
-      const card = document.getElementById('card-' + row);
-      if (!card || state.done.has(row)) return;
-
+      if (state.done.has(row)) return;
       state.done.add(row);
-      card.classList.add('done');
-      const doneBtn = document.getElementById('done-' + row);
-      if (doneBtn) { doneBtn.classList.add('is-done'); doneBtn.disabled = true; doneBtn.textContent = '✅ Fait !'; }
       showToast('✅ Marqué comme fait !', 'success');
-      updateLocalStats();
 
       if (!API_URL) return;
       try {
@@ -1863,6 +1823,8 @@
           body: JSON.stringify({ action: 'done', row, platform, group, article }),
           redirect: 'follow',
         });
+        // Recharger la vue semaine pour refleter le changement
+        setTimeout(() => loadWeekView(), 300);
         fetchStats();
       } catch (err) {
         console.error('markDone error:', err);
@@ -1874,19 +1836,9 @@
     // MARK SKIP
     // ============================================================
     async function markSkip(row) {
-      const card = document.getElementById('card-' + row);
-      if (!card || state.skipped.has(row)) return;
-
+      if (state.skipped.has(row)) return;
       state.skipped.add(row);
-      card.classList.add('card-skip');
       showToast('⏭ Passé', 'warning', 1500);
-
-      setTimeout(() => {
-        if (card.parentNode) card.parentNode.removeChild(card);
-        updateLocalStats();
-        refreshSectionCounts();
-        checkEmptyContainer('manuelCards', 'manuel');
-      }, 400);
 
       if (!API_URL) return;
       try {
@@ -1896,6 +1848,7 @@
           body: JSON.stringify({ action: 'skip', row }),
           redirect: 'follow',
         });
+        setTimeout(() => loadWeekView(), 300);
         fetchStats();
       } catch (err) {
         console.error('markSkip error:', err);
@@ -1957,10 +1910,10 @@
         const msg = count > 0 ? '⚡ ' + count + ' tache(s) generee(s) !' : 'Planning deja a jour';
         showToast(msg, count > 0 ? 'success' : 'warning', 2500);
         updateGenerateTime(count);
-        switchTab('today');
+        switchTab('semaine');
         state.done.clear();
         state.skipped.clear();
-        await fetchToday();
+        await loadWeekView();
       } catch (err) {
         console.error('generateToday error:', err);
         showToast('Erreur génération planning', 'error', 3000);
@@ -2102,7 +2055,7 @@
     async function refreshAll() {
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
-      const promises = [fetchToday(), fetchConfig(), fetchTodayVideosInline()];
+      const promises = [loadWeekView(), fetchConfig(), fetchStats()];
       await Promise.all(promises);
       updateRefreshTime();
       setTimeout(() => btn.classList.remove('spinning'), 400);
@@ -2354,7 +2307,7 @@
           redirect: 'follow',
         });
         // Refresh stats
-        setTimeout(() => fetchTodayVideosInline(), 500);
+        setTimeout(() => loadWeekView(), 500);
       } catch (err) {
         console.error('updateVideoStatus error:', err);
         showToast('Erreur sync statut video', 'error');
@@ -2432,7 +2385,7 @@
         showToast('📊 Performances enregistrees !', 'success', 2500);
         closePerfModal();
         // Refresh stats
-        setTimeout(() => fetchTodayVideosInline(), 500);
+        setTimeout(() => loadWeekView(), 500);
       } catch (err) {
         console.error('submitPerf error:', err);
         showToast('Erreur envoi performances', 'error');
@@ -2443,32 +2396,12 @@
     }
 
     // ============================================================
-    // WEEK VIEW — v2.1.0 avec navigation + progress bars
+    // WEEK VIEW — v2.2.0 ecran principal unifie
     // ============================================================
-    let weekViewActive = false;
     let weekConfigCache = null;
     let weekVideosCache = null;
     let weekPlanningCache = null;
-    let weekOffset = 0; // 0 = cette semaine, -1 = precedente, +1 = suivante
-
-    function toggleWeekView() {
-      weekViewActive = !weekViewActive;
-      const btn = document.getElementById('weekToggleBtn');
-      const todayView = document.getElementById('todayView');
-      const weekView = document.getElementById('weekView');
-
-      if (weekViewActive) {
-        btn.innerHTML = '📋 Aujourd\'hui';
-        todayView.classList.add('hidden');
-        weekView.classList.add('active');
-        weekOffset = 0;
-        loadWeekView();
-      } else {
-        btn.innerHTML = '📅 Semaine';
-        todayView.classList.remove('hidden');
-        weekView.classList.remove('active');
-      }
-    }
+    let weekOffset = 0;
 
     function navigateWeek(delta) {
       weekOffset += delta;
@@ -2711,6 +2644,9 @@
                 <div class="card-actions">
                   <button class="btn btn-copy" data-copytxt="${escHtml(copyTxt)}" onclick="copyText(this.dataset.copytxt)">📋 Copier</button>
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
+                  ${day.isToday && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
+                  ${day.isToday && isDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Fait</span>' : ''}
+                  ${day.isToday && isSkipped ? '<span style="color:var(--text-muted);font-weight:600;font-size:0.78rem;">⏭ Skippé</span>' : ''}
                 </div>
               </div>`;
           });
@@ -2743,6 +2679,7 @@
                 </div>
                 <div class="card-actions">
                   ${t.url ? `<button class="btn btn-open" data-url="${escHtml(t.url)}" onclick="window.open(this.dataset.url,'_blank')">🔗 Ouvrir</button>` : ''}
+                  ${day.isToday && !isDone && !isSkipped && matchedPlan ? `<button class="btn btn-done" data-action="done" data-row="${matchedPlan._row}">○ Fait</button><button class="btn btn-skip" data-action="skip" data-row="${matchedPlan._row}">⏭ Skip</button>` : ''}
                 </div>
               </div>`;
           });
@@ -2775,6 +2712,8 @@
                 </div>
                 <div class="card-actions">
                   ${v.promoCmd ? `<button class="btn btn-copy" data-copytxt="${escHtml(v.promoCmd)}" onclick="copyText(this.dataset.copytxt)">📋 Copier cmd</button>` : ''}
+                  ${day.isToday && !vDone ? `<button class="btn btn-done" data-action="vpublie" data-vrow="${v._row || ''}">✅ Publié</button><button class="btn btn-skip" data-action="vskip" data-vrow="${v._row || ''}">⏭ Skip</button>` : ''}
+                  ${day.isToday && vDone ? '<span style="color:var(--success);font-weight:600;font-size:0.78rem;">✅ Publié</span>' : ''}
                 </div>
               </div>`;
           });
@@ -2803,6 +2742,24 @@
       if (body && body.classList.contains('week-day-body')) {
         body.classList.toggle('collapsed');
       }
+    }
+
+    // Tout plier / tout deplier
+    function toggleAllDays(expand) {
+      document.querySelectorAll('.week-day-header').forEach(h => {
+        if (expand) {
+          h.classList.remove('collapsed');
+        } else {
+          h.classList.add('collapsed');
+        }
+      });
+      document.querySelectorAll('.week-day-body').forEach(b => {
+        if (expand) {
+          b.classList.remove('collapsed');
+        } else {
+          b.classList.add('collapsed');
+        }
+      });
     }
 
     // ============================================================
@@ -2866,9 +2823,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
-      fetchToday().then(updateRefreshTime);
+      // v2.2.0 : vue semaine = ecran principal
+      weekOffset = 0;
+      loadWeekView().then(updateRefreshTime);
       fetchConfig();
-      fetchTodayVideosInline();
+      fetchStats();
       // Restore last generate timestamp
       const lastGen = localStorage.getItem('promo-lastGenerate');
       if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
