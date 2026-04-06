@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.6.0
+// Version : v2.0.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -77,6 +77,12 @@ function doGet(e) {
         break;
       case 'refreshContent':
         result = refreshContent();
+        break;
+      case 'weekPlanning':
+        result = getWeekPlanning(date);
+        break;
+      case 'trendingAngles':
+        result = getTrendingAngles();
         break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
@@ -1501,6 +1507,106 @@ function refreshContent() {
   }
 
   return { ok: true, textes: nbTextes, videos: nbVideos };
+}
+
+// ── Week Planning : retourne les taches planifiees pour une semaine (lun-ven) ──
+
+function getWeekPlanning(weekStartStr) {
+  // Si pas de date fournie, calculer le lundi de la semaine courante
+  var monday;
+  if (weekStartStr) {
+    monday = parseDate(weekStartStr);
+  }
+  if (!monday) {
+    var now = new Date();
+    var day = now.getDay(); // 0=dim, 1=lun...
+    var diff = (day === 0) ? -6 : 1 - day;
+    monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  }
+
+  // Generer les 5 dates de la semaine (lun a ven)
+  var weekDates = [];
+  for (var d = 0; d < 5; d++) {
+    var dt = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + d);
+    weekDates.push(formatDate(dt));
+  }
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var planning = getSheetData(ss, SHEET_NAME_PLANNING);
+
+  // Creer un index rapide des dates de la semaine
+  var weekSet = {};
+  weekDates.forEach(function(ds) { weekSet[ds] = true; });
+
+  // Filtrer les lignes qui tombent dans cette semaine
+  var filtered = planning.filter(function(row) {
+    return weekSet[row.date] === true;
+  });
+
+  var result = filtered.map(function(row) {
+    return {
+      date: row.date,
+      platform: row.platform || '',
+      group: row.group || '',
+      article: row.article || '',
+      status: row.status || '',
+      doneAt: row.doneAt || '',
+      _row: row._row
+    };
+  });
+
+  return { ok: true, planning: result };
+}
+
+// ── Trending Angles : Gemini genere 6 angles promo tendance ──
+
+function getTrendingAngles() {
+  // 1. Recuperer la cle Gemini (meme logique que refreshContent)
+  var geminiKey = '';
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var stratSheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
+    if (stratSheet) {
+      var stratData = stratSheet.getDataRange().getValues();
+      for (var i = 0; i < stratData.length; i++) {
+        if (String(stratData[i][0]).toLowerCase() === 'gemini_key') {
+          geminiKey = String(stratData[i][1]).trim();
+          break;
+        }
+      }
+    }
+  } catch (e) { /* ignore */ }
+  if (!geminiKey) {
+    geminiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY') || '';
+  }
+  if (!geminiKey) {
+    return { ok: false, error: 'Cle Gemini introuvable (ni dans Strategie ni dans ScriptProperties)' };
+  }
+
+  var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey;
+
+  // 2. Prompt pour 6 angles tendance
+  var prompt = 'You are a social media trend analyst and marketing strategist. Your job is to identify CURRENT trending topics in AI, productivity, and no-code spaces, then suggest promotional angles that leverage these trends.\n\n'
+    + 'Generate exactly 6 trending promo angles:\n'
+    + '- 3 for DictoKey (AI voice keyboard for Android, dictate instead of typing, 52 languages, AI auto-correction, $4.99/month on Google Play Store, website: dictokey.com)\n'
+    + '- 3 for NoCodeFlow (no-code automation blog, tutorials for n8n/Make.com/Zapier, free content at nocode-flow.com)\n\n'
+    + 'RULES:\n'
+    + '- Each angle MUST reference a REAL current trend (AI agents, voice-first interfaces, automation replacing jobs, etc.)\n'
+    + '- Explain the trend briefly and how to leverage it for promotion\n'
+    + '- hookFR = catchy hook in French, hookEN = catchy hook in English\n'
+    + '- platform = the BEST social platform for this angle (tiktok, twitter, facebook, linkedin, instagram)\n'
+    + '- Be creative, current, and actionable\n'
+    + '- Do NOT invent product features\n\n'
+    + 'RESPOND WITH ONLY valid JSON, no markdown:\n'
+    + '{"angles":[{"product":"DictoKey","trend":"description of the current trend","angle":"the promo angle to use","hookFR":"accroche en francais","hookEN":"hook in english","platform":"tiktok"}]}';
+
+  var geminiResult = callGemini(endpoint, prompt);
+  if (!geminiResult.ok) {
+    return { ok: false, error: 'Erreur Gemini trending angles : ' + geminiResult.error };
+  }
+
+  var angles = (geminiResult.data && geminiResult.data.angles) ? geminiResult.data.angles : [];
+  return { ok: true, angles: angles };
 }
 
 // ── Helper : appeler Gemini Flash et parser la reponse JSON ──
