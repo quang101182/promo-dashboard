@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v2.3.0
+// Version : v2.4.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -1367,6 +1367,12 @@ function addMissingConfig() {
     ['TikTok',   '@se7en.news.ai',  'https://www.tiktok.com/@se7en.news.ai',  'MANUEL', true,  'weekly', '', '4323 followers - Videos FR'],
     ['Instagram','Bruce Li',         'https://www.instagram.com/',              'MANUEL', true,  'weekly', '', 'Business account - Reels cross-post'],
     ['YouTube',  '@se7enai',         'https://www.youtube.com/',                'MANUEL', false, 'weekly', '', 'Shorts - A configurer'],
+    ['Facebook', 'Bubble.io (Certified Bubble Developers) & No-Code Developers', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'EN - No-code devs community'],
+    ['Facebook', 'n8n Workflow Automation Community', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'EN - n8n community'],
+    ['Facebook', 'THE AGENTIC AI COMMUNITY', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'EN - AI agents community'],
+    ['Facebook', 'NoCode France', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'FR - Audience francaise'],
+    ['Facebook', 'Automatisation, IA et No Code', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'FR - Audience francaise'],
+    ['Facebook', 'Bubble.io Community - No-Code SaaS Startup Hub', 'https://www.facebook.com/groups', 'MANUEL', true, 'weekly', '', 'EN - Bubble + SaaS'],
   ];
 
   var added = [];
@@ -1542,6 +1548,14 @@ function getWeekPlanning(weekStartStr) {
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var planning = getSheetData(ss, SHEET_NAME_PLANNING);
+  var articles = getSheetData(ss, SHEET_NAME_ARTICLES);
+  var textes   = getSheetData(ss, SHEET_NAME_TEXTES);
+
+  // Index Articles par slug
+  var articlesIndex = {};
+  articles.forEach(function(row) {
+    articlesIndex[row.slug] = row;
+  });
 
   // Creer un index rapide des dates de la semaine
   var weekSet = {};
@@ -1553,13 +1567,29 @@ function getWeekPlanning(weekStartStr) {
   });
 
   var result = filtered.map(function(row) {
+    var article = articlesIndex[row.article] || {};
+
+    // Textes correspondants (supporte wildcard article='*')
+    var matchingTextes = textes.filter(function(t) {
+      return t.platform === row.platform && (t.article === row.article || t.article === '*');
+    });
+    var resolvedTextes = matchingTextes.map(function(t) {
+      return {
+        variant  : t.variant,
+        template : t.template,
+        resolved : resolveTemplate(t.template, article)
+      };
+    });
+
     return {
       date: row.date,
       platform: row.platform || '',
       group: row.group || '',
       article: row.article || '',
+      articleTitle: article.title || row.article,
       status: row.status || '',
       doneAt: row.doneAt || '',
+      textes: resolvedTextes,
       _row: row._row
     };
   });

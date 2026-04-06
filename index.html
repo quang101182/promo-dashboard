@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.3.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.4.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.3.0</title>
+  <title>Promo Dashboard v2.4.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1316,7 +1316,7 @@
         </div>
       </div>
 
-      <div class="footer">v2.3.0 — Promo Dashboard</div>
+      <div class="footer">v2.4.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1428,7 +1428,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.3.0 — Promo Dashboard</div>
+      <div class="footer">v2.4.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -2402,7 +2402,7 @@
     }
 
     // ============================================================
-    // WEEK VIEW — v2.3.0 ecran principal unifie
+    // WEEK VIEW — v2.4.0 ecran principal unifie
     // ============================================================
     let weekConfigCache = null;
     let weekVideosCache = null;
@@ -2583,7 +2583,7 @@
     function generatePromoCmd(group, dayIso, configIdx) {
       // Determine language from group/account name
       const groupLower = (group || '').toLowerCase();
-      const isFR = groupLower.includes('news.ai') || groupLower.includes('bruce li');
+      const isFR = groupLower.includes('news.ai') || groupLower.includes('bruce li') || groupLower.includes('nocode france') || groupLower.includes('automatisation, ia et no code');
       const lang = isFR ? 'fr' : 'en';
 
       // Seed based on date + index for deterministic but varied rotation
@@ -2710,15 +2710,16 @@
             const matchedPlan = dayPlanning.find(p => (p.platform || '').toLowerCase() === platformKey && (p.group || '').toLowerCase() === (t.group || '').toLowerCase());
             const isDone = matchedPlan && matchedPlan.status === 'done';
             const isSkipped = matchedPlan && matchedPlan.status === 'skipped';
-            const articleTitle = matchedPlan ? (matchedPlan.article || '') : '';
+            const articleTitle = matchedPlan ? (matchedPlan.articleTitle || matchedPlan.article || '') : '';
             const statusClass = isDone ? 'is-done' : isSkipped ? 'is-skipped' : '';
             // Next action badge : premiere tache non-done du jour courant
             const isNextAction = day.isToday && !isDone && !isSkipped && !firstNextActionSet && !nextActionForDay;
             if (isNextAction) { nextActionForDay = true; firstNextActionSet = true; }
 
-            // Store data for copy/open
+            // Store data for copy/open — utiliser le texte resolu du post (pas le slug)
             const wkey = 'wt-' + day.isoStr + '-' + t._row;
-            const copyTxt = articleTitle || t.group;
+            const resolvedText = matchedPlan && matchedPlan.textes && matchedPlan.textes.length > 0 ? matchedPlan.textes[0].resolved : '';
+            const copyTxt = resolvedText || articleTitle || t.group;
 
             daysHtml += `
               <div class="week-rich-card type-texte ${statusClass}${isNextAction ? ' is-next-action' : ''}">
@@ -3021,7 +3022,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkApiUrl();
-      // v2.3.0 : vue semaine = ecran principal
+      // v2.4.0 : vue semaine = ecran principal
       weekOffset = 0;
       loadWeekView().then(updateRefreshTime);
       fetchConfig();
