@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v1.5.0
+// Version : v1.6.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -74,6 +74,9 @@ function doGet(e) {
         break;
       case 'addMissingConfig':
         result = addMissingConfig();
+        break;
+      case 'refreshContent':
+        result = refreshContent();
         break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
@@ -1371,4 +1374,146 @@ function addMissingConfig() {
   }
 
   return { ok: true, added: added, message: added.length > 0 ? added.length + ' plateforme(s) ajoutee(s)' : 'Toutes les plateformes sont deja presentes' };
+}
+
+// ── Rotation intelligente de contenu avec IA (Gemini Flash) ──
+
+function refreshContent() {
+  // 1. Recuperer la cle Gemini
+  var geminiKey = '';
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var stratSheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
+    if (stratSheet) {
+      var stratData = stratSheet.getDataRange().getValues();
+      for (var i = 0; i < stratData.length; i++) {
+        if (String(stratData[i][0]).toLowerCase() === 'gemini_key') {
+          geminiKey = String(stratData[i][1]).trim();
+          break;
+        }
+      }
+    }
+  } catch (e) { /* ignore */ }
+  if (!geminiKey) {
+    geminiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY') || '';
+  }
+  if (!geminiKey) {
+    return { ok: false, error: 'Cle Gemini introuvable (ni dans Strategie ni dans ScriptProperties)' };
+  }
+
+  var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey;
+
+  // 2. Generer les templates texte
+  var promptTextes = 'Tu es un expert marketing reseaux sociaux. Genere 5 templates de posts varies pour promouvoir ces produits :\n'
+    + '- DictoKey : clavier vocal IA pour Android (4.99 EUR/mois), dicte au lieu de taper, 52 langues, correction IA\n'
+    + '- NoCodeFlow : blog sur l\'automatisation no-code (n8n, Make, Zapier), articles tutoriels\n\n'
+    + 'Chaque template doit :\n'
+    + '- Avoir un angle DIFFERENT (question, temoignage, astuce, comparaison, defi)\n'
+    + '- Contenir {title} et {url} comme placeholders pour l\'article/produit\n'
+    + '- Etre adapte pour Facebook/Twitter (court, engageant, avec CTA)\n'
+    + '- NE PAS etre generique - parler du PRODUIT specifiquement\n\n'
+    + 'Reponds UNIQUEMENT en JSON valide sans markdown : { "templates": [{ "platform": "facebook|twitter", "article": "*", "template": "le texte", "variant": "angle_utilise" }] }';
+
+  var textesResult = callGemini(endpoint, promptTextes);
+  if (!textesResult.ok) {
+    return { ok: false, error: 'Erreur Gemini textes : ' + textesResult.error };
+  }
+
+  // 3. Generer les hooks video
+  var promptVideos = 'Tu es un expert TikTok/Reels. Genere 5 hooks video percutants pour ces produits :\n'
+    + '- DictoKey : clavier vocal IA pour Android, dictee vocale 10x plus rapide que taper\n'
+    + '- NoCodeFlow : automatiser tout sans coder\n\n'
+    + 'Chaque hook doit :\n'
+    + '- Etre DIFFERENT (proof-first, question choc, before/after, stat, defi)\n'
+    + '- Durer 3 secondes max a lire\n'
+    + '- Etre en anglais (3 DictoKey) et francais (2 NoCodeFlow)\n\n'
+    + 'Reponds UNIQUEMENT en JSON valide sans markdown : { "videos": [{ "produit": "DictoKey|NoCodeFlow", "hook": "le hook", "langue": "EN|FR", "angle": "type_angle" }] }';
+
+  var videosResult = callGemini(endpoint, promptVideos);
+  if (!videosResult.ok) {
+    return { ok: false, error: 'Erreur Gemini videos : ' + videosResult.error };
+  }
+
+  // 4. Ecrire les templates dans l'onglet Textes (ajouter apres les existants)
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var textesSheet = ss.getSheetByName(SHEET_NAME_TEXTES);
+  var nbTextes = 0;
+  if (textesSheet && textesResult.data && textesResult.data.templates) {
+    var templates = textesResult.data.templates;
+    var lastRow = textesSheet.getLastRow();
+    for (var i = 0; i < templates.length; i++) {
+      var t = templates[i];
+      textesSheet.getRange(lastRow + 1 + i, 1, 1, 4).setValues([[
+        t.platform || 'facebook',
+        t.article || '*',
+        t.template || '',
+        t.variant || ''
+      ]]);
+      nbTextes++;
+    }
+  }
+
+  // 5. Ecrire les videos dans l'onglet Contenu (ajouter pour la semaine prochaine)
+  var contenuSheet = ss.getSheetByName(SHEET_NAME_CONTENU);
+  var nbVideos = 0;
+  if (contenuSheet && videosResult.data && videosResult.data.videos) {
+    var videos = videosResult.data.videos;
+    var lastRowC = contenuSheet.getLastRow();
+    // Calculer les dates de la semaine prochaine (lun, mer, ven)
+    var today = new Date();
+    var dayOfWeek = today.getDay(); // 0=dim, 1=lun...
+    var daysUntilNextMon = (dayOfWeek === 0) ? 1 : (8 - dayOfWeek);
+    var nextMon = new Date(today.getTime() + daysUntilNextMon * 86400000);
+    var nextWed = new Date(nextMon.getTime() + 2 * 86400000);
+    var nextFri = new Date(nextMon.getTime() + 4 * 86400000);
+    var scheduleDates = [nextMon, nextWed, nextFri, nextMon, nextWed];
+
+    for (var j = 0; j < videos.length; j++) {
+      var v = videos[j];
+      var schedDate = scheduleDates[j % scheduleDates.length];
+      var dateStr = Utilities.formatDate(schedDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      var platform = (v.langue === 'FR') ? 'TikTok FR' : 'TikTok EN';
+      var command = '/promo pip ' + (v.produit === 'DictoKey' ? 'dictokey' : 'nocodeflow') + ' "' + (v.hook || '') + '"';
+      contenuSheet.getRange(lastRowC + 1 + j, 1, 1, 6).setValues([[
+        dateStr,
+        platform,
+        v.produit || '',
+        v.hook || '',
+        command,
+        v.angle || ''
+      ]]);
+      nbVideos++;
+    }
+  }
+
+  return { ok: true, textes: nbTextes, videos: nbVideos };
+}
+
+// ── Helper : appeler Gemini Flash et parser la reponse JSON ──
+
+function callGemini(endpoint, prompt) {
+  try {
+    var payload = {
+      contents: [{ parts: [{ text: prompt }] }]
+    };
+    var options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    var response = UrlFetchApp.fetch(endpoint, options);
+    var code = response.getResponseCode();
+    if (code !== 200) {
+      return { ok: false, error: 'HTTP ' + code + ' : ' + response.getContentText().substring(0, 200) };
+    }
+    var json = JSON.parse(response.getContentText());
+    var text = json.candidates[0].content.parts[0].text;
+    // Nettoyer le markdown eventuel autour du JSON
+    var cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    var data = JSON.parse(cleaned);
+    return { ok: true, data: data };
+  } catch (e) {
+    return { ok: false, error: e.toString() };
+  }
 }

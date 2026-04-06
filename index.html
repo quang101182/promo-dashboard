@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.8.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.9.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.8.0</title>
+  <title>Promo Dashboard v1.9.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1081,7 +1081,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.8.0 — Promo Dashboard</div>
+      <div class="footer">v1.9.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1169,9 +1169,11 @@
 
       <button onclick="addMissingPlatforms()" id="addPlatformsBtn" style="display:block;width:100%;margin-top:12px;padding:11px 20px;background:rgba(6,182,212,0.15);color:var(--accent-light);border:1px solid rgba(6,182,212,0.3);border-radius:var(--radius-btn);cursor:pointer;font-size:0.85rem;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s ease;">📡 Ajouter plateformes manquantes</button>
 
+      <button onclick="refreshContent()" id="refreshContentBtn" style="display:block;width:100%;margin-top:12px;padding:11px 20px;background:rgba(124,58,237,0.15);color:var(--primary-light);border:1px solid rgba(124,58,237,0.3);border-radius:var(--radius-btn);cursor:pointer;font-size:0.85rem;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s ease;">🔄 Rafraîchir le contenu (IA)</button>
+
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.8.0 — Promo Dashboard</div>
+      <div class="footer">v1.9.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1708,6 +1710,31 @@
       } finally {
         btn.disabled = false;
         btn.textContent = '📡 Ajouter plateformes manquantes';
+      }
+    }
+
+    // ============================================================
+    // REFRESH CONTENT (IA Gemini)
+    // ============================================================
+    async function refreshContent() {
+      if (!API_URL) { showToast('API non configuree', 'error'); return; }
+      const btn = document.getElementById('refreshContentBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Génération IA en cours...';
+      try {
+        const res = await fetch(`${API_URL}?action=refreshContent`, { redirect: 'follow' });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(`${data.textes} templates + ${data.videos} vidéos générés`, 'success', 3000);
+        } else {
+          showToast('Erreur : ' + (data.error || 'inconnue'), 'error');
+        }
+      } catch (err) {
+        console.error('refreshContent error:', err);
+        showToast('Erreur refresh contenu', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Rafraîchir le contenu (IA)';
       }
     }
 
