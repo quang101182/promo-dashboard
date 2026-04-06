@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v1.6.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v1.7.0 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v1.6.0</title>
+  <title>Promo Dashboard v1.7.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -691,55 +691,6 @@
     }
     .btn-perf:hover { background: rgba(6, 182, 212, 0.25); }
 
-    /* ===== VIDEO STATS SUMMARY ===== */
-    .video-stats-summary {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-card);
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .video-stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      min-width: 56px;
-    }
-    .video-stat-num {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .video-stat-label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .video-stat-item.accent .video-stat-num { color: var(--accent-light); }
-    .video-stat-item.success .video-stat-num { color: var(--success); }
-    .video-stat-item.warning .video-stat-num { color: var(--warning); }
-
-    .video-best-hook {
-      width: 100%;
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border);
-    }
-    .video-best-hook strong { color: var(--accent-light); }
-
     /* ===== DAY GROUP HEADER ===== */
     .video-day-header {
       font-size: 0.75rem;
@@ -896,7 +847,6 @@
   <!-- TABS -->
   <nav class="tabs">
     <button class="tab-btn active" onclick="switchTab('today')" id="tab-today">Aujourd'hui</button>
-    <button class="tab-btn" onclick="switchTab('videos')" id="tab-videos">Stats Video</button>
     <button class="tab-btn" onclick="switchTab('settings')" id="tab-settings">Settings</button>
   </nav>
 
@@ -940,60 +890,7 @@
         </div>
       </div>
 
-      <div class="footer">v1.6.0 — Promo Dashboard</div>
-    </div>
-  </div>
-
-  <!-- TAB: VIDEOS (Stats & Performance) -->
-  <div class="tab-panel" id="panel-videos">
-    <div class="container">
-
-      <!-- Week Stats Summary -->
-      <div class="video-stats-summary" id="videoStatsSummary">
-        <div class="video-stat-item warning">
-          <span class="video-stat-num" id="vstat-planifie">-</span>
-          <span class="video-stat-label">Planifie</span>
-        </div>
-        <div class="video-stat-item accent">
-          <span class="video-stat-num" id="vstat-production">-</span>
-          <span class="video-stat-label">En prod</span>
-        </div>
-        <div class="video-stat-item success">
-          <span class="video-stat-num" id="vstat-publie">-</span>
-          <span class="video-stat-label">Publie</span>
-        </div>
-        <div class="video-stat-item">
-          <span class="video-stat-num" id="vstat-skip">-</span>
-          <span class="video-stat-label">Skip</span>
-        </div>
-        <div class="video-stat-item accent">
-          <span class="video-stat-num" id="vstat-vues">-</span>
-          <span class="video-stat-label">Vues</span>
-        </div>
-        <div class="video-best-hook" id="vstat-besthook"></div>
-      </div>
-
-      <!-- Videos du jour -->
-      <div class="section-group">
-        <div class="section-header">
-          <span class="section-title">VIDEOS DU JOUR</span>
-          <span class="section-badge" id="videoCountStats">0</span>
-        </div>
-        <div id="videoCards">
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:40%;height:12px"></div>
-            <div class="skeleton-line" style="width:80%;height:14px"></div>
-            <div class="skeleton-line" style="width:55%;height:10px"></div>
-          </div>
-          <div class="skeleton-card">
-            <div class="skeleton-line" style="width:35%;height:12px"></div>
-            <div class="skeleton-line" style="width:75%;height:14px"></div>
-            <div class="skeleton-line" style="width:50%;height:10px"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer">v1.6.0 — Promo Dashboard</div>
+      <div class="footer">v1.7.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1083,7 +980,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v1.6.0 — Promo Dashboard</div>
+      <div class="footer">v1.7.0 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1126,7 +1023,7 @@
     // ============================================================
     // CONSTANTES
     // ============================================================
-    const VERSION = '1.6.0';
+    const VERSION = '1.7.0';
 
     const PLATFORM_ICONS = {
       facebook:  '📘',
@@ -1192,14 +1089,6 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('panel-' + name).classList.add('active');
       document.getElementById('tab-' + name).classList.add('active');
-      // Lazy-load videos on first switch
-      if (name === 'videos') fetchTodayVideos();
-      // Update stats bar context
-      if (name === 'videos') {
-        document.querySelector('.stats-bar').style.display = 'none';
-      } else {
-        document.querySelector('.stats-bar').style.display = '';
-      }
     }
 
     // ============================================================
@@ -1713,7 +1602,6 @@
       const btn = document.getElementById('refreshBtn');
       btn.classList.add('spinning');
       const promises = [fetchToday(), fetchConfig(), fetchTodayVideosInline()];
-      if (videoState.loaded) promises.push(fetchTodayVideos());
       await Promise.all(promises);
       updateRefreshTime();
       setTimeout(() => btn.classList.remove('spinning'), 400);
@@ -1861,102 +1749,10 @@
     }
 
     // ============================================================
-    // VIDEO STATE
+    // VIDEO CARD DATA
     // ============================================================
-    let videoState = {
-      videos: [],
-      weekStats: null,
-      currentPerfVideo: null,
-      loaded: false,
-    };
-
     window._videoCardData = {};
-
-    // ============================================================
-    // FETCH TODAY VIDEOS
-    // ============================================================
-    async function fetchTodayVideos() {
-      if (!checkApiUrl()) { renderMockVideos(); return; }
-      try {
-        const [todayRes, statsRes] = await Promise.all([
-          fetch(`${API_URL}?action=todayVideos`, { redirect: 'follow' }).then(r => r.json()),
-          fetch(`${API_URL}?action=videoStats`, { redirect: 'follow' }).then(r => r.json()),
-        ]);
-        videoState.videos = todayRes.videos || [];
-        videoState.weekStats = statsRes;
-        videoState.loaded = true;
-        renderVideoStats(statsRes);
-        renderVideoCards(videoState.videos);
-      } catch (err) {
-        console.error('fetchTodayVideos error:', err);
-        showToast('Erreur chargement videos', 'error', 3000);
-        renderErrorState('videoCards');
-      }
-    }
-
-    // ============================================================
-    // RENDER VIDEO STATS SUMMARY
-    // ============================================================
-    function renderVideoStats(stats) {
-      if (!stats || !stats.ok) return;
-      const c = stats.week_content || stats.content || {};
-      const p = stats.week_perf || stats.perf || {};
-      document.getElementById('vstat-planifie').textContent = c.planifie ?? 0;
-      document.getElementById('vstat-production').textContent = c.en_production ?? 0;
-      document.getElementById('vstat-publie').textContent = c.publie ?? 0;
-      document.getElementById('vstat-skip').textContent = c.skip ?? 0;
-      document.getElementById('vstat-vues').textContent = p.total_vues ?? 0;
-      const bestHookEl = document.getElementById('vstat-besthook');
-      if (p.best_hook) {
-        bestHookEl.innerHTML = 'Best hook: <strong>' + escHtml(p.best_hook) + '</strong>';
-      } else {
-        bestHookEl.innerHTML = '';
-      }
-    }
-
-    // ============================================================
-    // RENDER VIDEO CARDS
-    // ============================================================
-    function renderVideoCards(videos) {
-      const container = document.getElementById('videoCards');
-      const countEl = document.getElementById('videoCountStats');
-
-      if (!videos || videos.length === 0) {
-        countEl.textContent = '0';
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🎬</div>
-            <div class="empty-state-title">Aucune video aujourd'hui</div>
-            <div class="empty-state-sub">Pas de video planifiee pour aujourd'hui.</div>
-          </div>`;
-        return;
-      }
-
-      // Check if all videos are from today
-      const today = new Date().toISOString().split('T')[0];
-      const todayVideos = videos.filter(v => (v.date || '').startsWith(today));
-
-      if (todayVideos.length > 0) {
-        // Show today's videos
-        countEl.textContent = todayVideos.length;
-        container.innerHTML = todayVideos.map((v, idx) => buildVideoCardHtml(v, idx)).join('');
-      } else {
-        // Group by day
-        countEl.textContent = videos.length + ' (semaine)';
-        const grouped = {};
-        videos.forEach(v => {
-          const day = (v.date || 'Sans date').split('T')[0];
-          if (!grouped[day]) grouped[day] = [];
-          grouped[day].push(v);
-        });
-        let html = '';
-        Object.keys(grouped).sort().forEach(day => {
-          html += `<div class="video-day-header">${escHtml(day)}</div>`;
-          html += grouped[day].map((v, idx) => buildVideoCardHtml(v, idx)).join('');
-        });
-        container.innerHTML = html;
-      }
-    }
+    let videoState = { currentPerfVideo: null };
 
     // ============================================================
     // BUILD SINGLE VIDEO CARD HTML
@@ -2049,7 +1845,7 @@
           redirect: 'follow',
         });
         // Refresh stats
-        setTimeout(() => fetchTodayVideos(), 500);
+        setTimeout(() => fetchTodayVideosInline(), 500);
       } catch (err) {
         console.error('updateVideoStatus error:', err);
         showToast('Erreur sync statut video', 'error');
@@ -2127,7 +1923,7 @@
         showToast('📊 Performances enregistrees !', 'success', 2500);
         closePerfModal();
         // Refresh stats
-        setTimeout(() => fetchTodayVideos(), 500);
+        setTimeout(() => fetchTodayVideosInline(), 500);
       } catch (err) {
         console.error('submitPerf error:', err);
         showToast('Erreur envoi performances', 'error');
@@ -2135,25 +1931,6 @@
         btn.disabled = false;
         btn.textContent = 'Enregistrer';
       }
-    }
-
-    // ============================================================
-    // MOCK VIDEOS (quand API_URL est vide)
-    // ============================================================
-    function renderMockVideos() {
-      const mockVideos = [
-        { _row: 101, date: new Date().toISOString().split('T')[0], plateforme: 'tiktok', compte: '@dictokey', type: 'Hook', produit: 'DictoKey', hook: 'Tu tapes encore avec tes pouces ? Essaie ca...', langue: 'FR', duree: '30s', lien: '', statut: 'planifie', notes: '', promoCmd: '/promo video tiktok @dictokey FR "Tu tapes encore avec tes pouces ?"' },
-        { _row: 102, date: new Date().toISOString().split('T')[0], plateforme: 'instagram', compte: '@nocodeflow', type: 'Demo', produit: 'NoCodeFlow', hook: 'Build a full app without code in 60 seconds', langue: 'EN', duree: '60s', lien: '', statut: 'en_production', notes: 'Ajouter sous-titres', promoCmd: '/promo video instagram @nocodeflow EN "Build a full app without code"' },
-        { _row: 103, date: new Date().toISOString().split('T')[0], plateforme: 'tiktok', compte: '@dictokey', type: 'Tuto', produit: 'DictoKey', hook: '3 raccourcis clavier que personne connait', langue: 'FR', duree: '45s', lien: 'https://example.com', statut: 'publie', notes: '', promoCmd: '/promo video tiktok @dictokey FR "3 raccourcis clavier"' },
-      ];
-      videoState.videos = mockVideos;
-      videoState.loaded = true;
-      renderVideoStats({
-        ok: true,
-        content: { planifie: 1, en_production: 1, publie: 1, skip: 0, total: 3 },
-        perf: { total_vues: 1250, total_likes: 89, best_hook: 'Tu tapes encore avec tes pouces ?', best_completion: 72 },
-      });
-      renderVideoCards(mockVideos);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
