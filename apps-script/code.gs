@@ -1404,15 +1404,23 @@ function refreshContent() {
   var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey;
 
   // 2. Generer les templates texte
-  var promptTextes = 'Tu es un expert marketing reseaux sociaux. Genere 5 templates de posts varies pour promouvoir ces produits :\n'
-    + '- DictoKey : clavier vocal IA pour Android (4.99 EUR/mois), dicte au lieu de taper, 52 langues, correction IA\n'
-    + '- NoCodeFlow : blog sur l\'automatisation no-code (n8n, Make, Zapier), articles tutoriels\n\n'
-    + 'Chaque template doit :\n'
-    + '- Avoir un angle DIFFERENT (question, temoignage, astuce, comparaison, defi)\n'
-    + '- Contenir {title} et {url} comme placeholders pour l\'article/produit\n'
-    + '- Etre adapte pour Facebook/Twitter (court, engageant, avec CTA)\n'
-    + '- NE PAS etre generique - parler du PRODUIT specifiquement\n\n'
-    + 'Reponds UNIQUEMENT en JSON valide sans markdown : { "templates": [{ "platform": "facebook|twitter", "article": "*", "template": "le texte", "variant": "angle_utilise" }] }';
+  var promptTextes = 'You are a social media marketing expert promoting 2 specific products. Generate 5 Facebook/Twitter post templates.\n\n'
+    + 'PRODUCTS (use ONLY these verified features):\n'
+    + '1. DictoKey - AI voice keyboard for Android. Dictate instead of typing. 52 languages supported. AI auto-correction. $4.99/month on Google Play Store. Website: dictokey.com\n'
+    + '2. NoCodeFlow - Blog about no-code automation (n8n, Make.com, Zapier). Free tutorials and comparisons at nocode-flow.com\n\n'
+    + 'RULES:\n'
+    + '- Each template uses a DIFFERENT angle: question, tip, comparison, challenge, testimonial\n'
+    + '- Use {title} as placeholder for the article/feature name\n'
+    + '- Use {url} as placeholder for the link\n'
+    + '- Platform must be "facebook" or "twitter" ONLY (no linkedin, no instagram)\n'
+    + '- 3 templates about DictoKey, 2 about NoCodeFlow\n'
+    + '- Mix English (3) and French (2)\n'
+    + '- ALWAYS mention the product name (DictoKey or NoCodeFlow) explicitly\n'
+    + '- End with a clear CTA (download, try, read, check out + {url})\n'
+    + '- Do NOT invent features (no noise cancellation, no offline mode)\n'
+    + '- Short, punchy, conversational tone\n\n'
+    + 'RESPOND WITH ONLY valid JSON, no markdown:\n'
+    + '{"templates":[{"platform":"facebook","article":"*","template":"Your actual post text with {title} and {url}","variant":"angle_name"}]}';
 
   var textesResult = callGemini(endpoint, promptTextes);
   if (!textesResult.ok) {
@@ -1420,14 +1428,21 @@ function refreshContent() {
   }
 
   // 3. Generer les hooks video
-  var promptVideos = 'Tu es un expert TikTok/Reels. Genere 5 hooks video percutants pour ces produits :\n'
-    + '- DictoKey : clavier vocal IA pour Android, dictee vocale 10x plus rapide que taper\n'
-    + '- NoCodeFlow : automatiser tout sans coder\n\n'
-    + 'Chaque hook doit :\n'
-    + '- Etre DIFFERENT (proof-first, question choc, before/after, stat, defi)\n'
-    + '- Durer 3 secondes max a lire\n'
-    + '- Etre en anglais (3 DictoKey) et francais (2 NoCodeFlow)\n\n'
-    + 'Reponds UNIQUEMENT en JSON valide sans markdown : { "videos": [{ "produit": "DictoKey|NoCodeFlow", "hook": "le hook", "langue": "EN|FR", "angle": "type_angle" }] }';
+  var promptVideos = 'You are a TikTok/Reels content expert. Generate 5 video hooks for short-form video promotion.\n\n'
+    + 'PRODUCTS (verified features ONLY):\n'
+    + '1. DictoKey - AI voice keyboard for Android. Type by speaking. 10x faster than typing. 52 languages. AI correction. Play Store.\n'
+    + '2. NoCodeFlow - No-code automation blog. Tutorials for n8n, Make.com, Zapier at nocode-flow.com.\n\n'
+    + 'RULES:\n'
+    + '- Each hook must use a DIFFERENT style: proof-first, shocking-question, before-after, statistic, challenge\n'
+    + '- Maximum 8 words per hook\n'
+    + '- MUST mention the product name in the hook or it will be added after\n'
+    + '- Hook must grab attention in the first 3 seconds of a video\n'
+    + '- 3 hooks for DictoKey in ENGLISH\n'
+    + '- 2 hooks for NoCodeFlow in FRENCH\n'
+    + '- Be creative, punchy, NOT corporate\n'
+    + '- Do NOT invent features\n\n'
+    + 'RESPOND WITH ONLY valid JSON, no markdown:\n'
+    + '{"videos":[{"produit":"DictoKey","hook":"Your hook text","langue":"EN","angle":"style_name"}]}';
 
   var videosResult = callGemini(endpoint, promptVideos);
   if (!videosResult.ok) {
@@ -1472,15 +1487,14 @@ function refreshContent() {
       var v = videos[j];
       var schedDate = scheduleDates[j % scheduleDates.length];
       var dateStr = Utilities.formatDate(schedDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-      var platform = (v.langue === 'FR') ? 'TikTok FR' : 'TikTok EN';
-      var command = '/promo pip ' + (v.produit === 'DictoKey' ? 'dictokey' : 'nocodeflow') + ' "' + (v.hook || '') + '"';
-      contenuSheet.getRange(lastRowC + 1 + j, 1, 1, 6).setValues([[
-        dateStr,
-        platform,
-        v.produit || '',
-        v.hook || '',
-        command,
-        v.angle || ''
+      var compte = (v.langue === 'FR') ? '@se7en.news.ai' : '@se7en.video.ai';
+      var plateforme = 'TikTok';
+      var langCode = (v.langue || 'EN').toLowerCase();
+      var command = '/promo pip ' + langCode + ' ' + (v.hook || '');
+      // Columns: date, plateforme, compte, type, produit, hook, langue, duree, lien, statut, notes, promoCmd
+      contenuSheet.getRange(lastRowC + 1 + j, 1, 1, 12).setValues([[
+        dateStr, plateforme, compte, 'pip', v.produit || '', v.hook || '',
+        (v.langue || 'EN').toUpperCase(), '', '', 'planifie', v.angle || '', command
       ]]);
       nbVideos++;
     }
