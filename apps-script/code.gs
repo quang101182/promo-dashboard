@@ -1,6 +1,6 @@
 // ============================================================
 // PROMO DASHBOARD — Google Apps Script Backend
-// Version : v2.4.0
+// Version : v2.5.0
 // Projet  : NoCodeFlow — Stratégie Promo Multi-Plateforme
 // Auteur  : Claude Code (Anthropic) — 16/03/2026
 // ============================================================
@@ -23,6 +23,7 @@ var SHEET_NAME_CONTENU     = 'Contenu';
 var SHEET_NAME_PERFORMANCE = 'Performance';
 var SHEET_NAME_ALGONOTES   = 'AlgoNotes';
 var SHEET_NAME_ABTESTS     = 'ABTests';
+var SHEET_NAME_ASSETS      = 'Assets';
 
 // ── Point d'entrée GET ──────────────────────────────────────
 
@@ -86,6 +87,12 @@ function doGet(e) {
         break;
       case 'autoPromoStatus':
         result = getAutoPromoStatus();
+        break;
+      case 'assets':
+        result = getAssets(e && e.parameter ? e.parameter.produit : '');
+        break;
+      case 'setupAssets':
+        result = setupAssets();
         break;
       default:
         result = { ok: false, error: 'Action inconnue : ' + action };
@@ -155,6 +162,12 @@ function doPost(e) {
         break;
       case 'toggleAutoRappel':
         result = toggleAutoRappel(body);
+        break;
+      case 'addAsset':
+        result = addAsset(body);
+        break;
+      case 'updateAssetUsage':
+        result = updateAssetUsage(body);
         break;
       default:
         result = { ok: false, error: 'Action POST inconnue : ' + action };
@@ -1846,4 +1859,131 @@ function fixGroupNames() {
   Logger.log('fixGroupNames termine. ' + log.length + ' modifications.');
   Logger.log(log.join('\n'));
   return { ok: true, changes: log.length, details: log };
+}
+
+// ── SETUP ASSETS — Crée l'onglet Assets ───────────────────────
+
+function setupAssets() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var headers = ['fileId', 'filename', 'produit', 'type', 'tags', 'quality', 'features', 'driveUrl', 'thumbnailId', 'useCount', 'added', 'lastUsed'];
+  ensureSheet(ss, SHEET_NAME_ASSETS, headers);
+  return { ok: true, message: 'Onglet Assets créé/vérifié' };
+}
+
+// ── ACTION : assets (GET) — Retourne les assets, filtrable par produit ──
+
+function getAssets(produit) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_ASSETS);
+  if (!sheet) {
+    return { ok: false, error: 'Onglet Assets introuvable. Lancer setupAssets d\'abord.' };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) {
+    return { ok: true, assets: [] };
+  }
+
+  var headers = data[0];
+  var assets = [];
+  var produitCol = headers.indexOf('produit');
+
+  for (var i = 1; i < data.length; i++) {
+    // Filtrer par produit si fourni
+    if (produit && produitCol >= 0 && data[i][produitCol] !== produit) {
+      continue;
+    }
+    var row = {};
+    for (var j = 0; j < headers.length; j++) {
+      row[headers[j]] = data[i][j];
+    }
+    assets.push(row);
+  }
+
+  return { ok: true, assets: assets };
+}
+
+// ── ACTION : addAsset (POST) — Ajouter un asset ────────────────
+
+function addAsset(body) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_ASSETS);
+  if (!sheet) {
+    return { ok: false, error: 'Onglet Assets introuvable. Lancer setupAssets d\'abord.' };
+  }
+
+  var fileId = body.fileId || '';
+  if (!fileId) {
+    return { ok: false, error: 'fileId requis' };
+  }
+
+  // Vérifier doublon fileId
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0] || [];
+  var fileIdCol = headers.indexOf('fileId');
+  if (fileIdCol < 0) return { ok: false, error: 'Colonne fileId introuvable dans Assets' };
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][fileIdCol]).trim() === String(fileId).trim()) {
+      return { ok: false, error: 'Asset déjà existant avec ce fileId : ' + fileId };
+    }
+  }
+
+  var now = formatDate(new Date());
+  var newRow = [
+    fileId,
+    body.filename || '',
+    body.produit || '',
+    body.type || '',
+    body.tags || '',
+    body.quality || '',
+    body.features || '',
+    body.driveUrl || '',
+    body.thumbnailId || '',
+    0,        // useCount
+    now,      // added
+    ''        // lastUsed
+  ];
+
+  sheet.appendRow(newRow);
+
+  var asset = {};
+  for (var j = 0; j < headers.length; j++) {
+    asset[headers[j]] = newRow[j];
+  }
+
+  return { ok: true, asset: asset };
+}
+
+// ── ACTION : updateAssetUsage (POST) — Incrémenter useCount ────
+
+function updateAssetUsage(body) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_ASSETS);
+  if (!sheet) {
+    return { ok: false, error: 'Onglet Assets introuvable.' };
+  }
+
+  var fileId = body.fileId || '';
+  if (!fileId) {
+    return { ok: false, error: 'fileId requis' };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0] || [];
+  var fileIdCol = headers.indexOf('fileId');
+  var useCountCol = headers.indexOf('useCount');
+  var lastUsedCol = headers.indexOf('lastUsed');
+  if (fileIdCol < 0 || useCountCol < 0 || lastUsedCol < 0) return { ok: false, error: 'Colonnes Assets manquantes' };
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][fileIdCol]).trim() === String(fileId).trim()) {
+      var currentCount = parseInt(data[i][useCountCol], 10) || 0;
+      var now = formatDate(new Date());
+      sheet.getRange(i + 1, useCountCol + 1).setValue(currentCount + 1);
+      sheet.getRange(i + 1, lastUsedCol + 1).setValue(now);
+      return { ok: true };
+    }
+  }
+
+  return { ok: false, error: 'Asset non trouvé avec fileId : ' + fileId };
 }
