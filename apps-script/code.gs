@@ -153,6 +153,9 @@ function doPost(e) {
       case 'toggleAutoPromo':
         result = toggleAutoPromo(body);
         break;
+      case 'toggleAutoRappel':
+        result = toggleAutoRappel(body);
+        break;
       default:
         result = { ok: false, error: 'Action POST inconnue : ' + action };
     }
@@ -1622,26 +1625,27 @@ function getAutoPromoStatus() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
   if (!sheet) {
-    return { ok: true, enabled: false, hour: '19:00' };
+    return { ok: true, enabled: false, rappelEnabled: false, hour: '19:00' };
   }
 
   var data = sheet.getDataRange().getValues();
+  var enabled = false;
+  var rappelEnabled = false;
+  var hour = '19:00';
+
   for (var i = 0; i < data.length; i++) {
     if (data[i][0] === 'auto_promo') {
-      var enabled = data[i][1] === true || data[i][1] === 'true';
-      var hour = '19:00';
-      // Chercher la ligne auto_promo_hour
-      for (var j = 0; j < data.length; j++) {
-        if (data[j][0] === 'auto_promo_hour') {
-          hour = data[j][1] || '19:00';
-          break;
-        }
-      }
-      return { ok: true, enabled: enabled, hour: hour };
+      enabled = data[i][1] === true || data[i][1] === 'true';
+    }
+    if (data[i][0] === 'auto_rappel') {
+      rappelEnabled = data[i][1] === true || data[i][1] === 'true';
+    }
+    if (data[i][0] === 'auto_promo_hour') {
+      hour = data[i][1] || '19:00';
     }
   }
 
-  return { ok: true, enabled: false, hour: '19:00' };
+  return { ok: true, enabled: enabled, rappelEnabled: rappelEnabled, hour: hour };
 }
 
 // ── ACTION : toggleAutoPromo ─────────────────────────────────
@@ -1677,6 +1681,34 @@ function toggleAutoPromo(body) {
   }
 
   return { ok: true, enabled: enabled };
+}
+
+// ── ACTION : toggleAutoRappel ─────────────────────────────────
+
+function toggleAutoRappel(body) {
+  var enabled = body.enabled === true || body.enabled === 'true';
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME_STRATEGIE);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME_STRATEGIE);
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var found = false;
+
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][0] === 'auto_rappel') {
+      sheet.getRange(i + 1, 2).setValue(enabled);
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    sheet.appendRow(['auto_rappel', enabled]);
+  }
+
+  return { ok: true, rappelEnabled: enabled };
 }
 
 // ── Helper : appeler Gemini Flash et parser la reponse JSON ──

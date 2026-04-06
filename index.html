@@ -1298,7 +1298,10 @@
 
       <!-- Boutons Tout plier / Tout deplier -->
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
-        <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto Vidéo OFF</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto Vidéo OFF</button>
+          <button class="btn-week-toggle" id="autoRappelBtn" onclick="toggleAutoRappel()" style="background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.3);color:var(--primary-light);">⏸ Rappels OFF</button>
+        </div>
         <div style="display:flex;gap:6px;">
           <button class="btn-week-toggle" onclick="toggleAllDays(false)">▲ Tout plier</button>
           <button class="btn-week-toggle" onclick="toggleAllDays(true)">▼ Tout déplier</button>
@@ -2906,6 +2909,58 @@
     }
 
     // ============================================================
+    // AUTO-RAPPELS TEXTE
+    // ============================================================
+    let autoRappelEnabled = false;
+
+    async function loadAutoRappelStatus() {
+      if (!API_URL) return;
+      try {
+        const res = await fetch(`${API_URL}?action=autoPromoStatus`, { redirect: 'follow' });
+        const data = await res.json();
+        autoRappelEnabled = data.rappelEnabled || false;
+        updateAutoRappelBtn();
+      } catch (err) {
+        console.error('loadAutoRappelStatus error:', err);
+      }
+    }
+
+    function updateAutoRappelBtn() {
+      const btn = document.getElementById('autoRappelBtn');
+      if (!btn) return;
+      if (autoRappelEnabled) {
+        btn.textContent = '📝 Rappels ON';
+        btn.style.background = 'rgba(124,58,237,0.2)';
+        btn.style.borderColor = 'var(--primary-light)';
+        btn.style.color = 'var(--primary-light)';
+      } else {
+        btn.textContent = '⏸ Rappels OFF';
+        btn.style.background = 'rgba(124,58,237,0.08)';
+        btn.style.borderColor = 'rgba(124,58,237,0.3)';
+        btn.style.color = 'var(--text-muted)';
+      }
+    }
+
+    async function toggleAutoRappel() {
+      if (!API_URL) { showToast('API non configuree', 'error'); return; }
+      autoRappelEnabled = !autoRappelEnabled;
+      updateAutoRappelBtn();
+      showToast(autoRappelEnabled ? '📝 Rappels texte activés' : '⏸ Rappels texte désactivés', autoRappelEnabled ? 'success' : 'warning', 2500);
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'toggleAutoRappel', enabled: autoRappelEnabled }),
+          redirect: 'follow',
+        });
+      } catch (err) {
+        console.error('toggleAutoRappel error:', err);
+        showToast('Erreur sync rappels', 'error');
+      }
+    }
+
+    // ============================================================
     // VEILLE IA — Trending promo angles
     // ============================================================
     async function fetchTrendingAngles() {
@@ -2972,6 +3027,7 @@
       fetchConfig();
       fetchStats();
       loadAutoPromoStatus();
+      loadAutoRappelStatus();
       // Restore last generate timestamp
       const lastGen = localStorage.getItem('promo-lastGenerate');
       if (lastGen) document.getElementById('lastGenerate').textContent = lastGen;
