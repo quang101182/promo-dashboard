@@ -1299,7 +1299,7 @@
       <!-- Boutons Tout plier / Tout deplier -->
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
         <div style="display:flex;gap:6px;">
-          <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Auto Vidéo OFF</button>
+          <button class="btn-week-toggle" id="autoPromoBtn" onclick="toggleAutoPromo()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--success);">⏸ Rappel Vidéo OFF</button>
           <button class="btn-week-toggle" id="autoRappelBtn" onclick="toggleAutoRappel()" style="background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.3);color:var(--primary-light);">⏸ Rappels OFF</button>
         </div>
         <div style="display:flex;gap:6px;">
@@ -2904,12 +2904,12 @@
       const btn = document.getElementById('autoPromoBtn');
       if (!btn) return;
       if (autoPromoEnabled) {
-        btn.textContent = '🎬 Auto Vidéo ON';
+        btn.textContent = '🎬 Rappel Vidéo ON';
         btn.style.background = 'rgba(16,185,129,0.2)';
         btn.style.borderColor = 'var(--success)';
         btn.style.color = 'var(--success)';
       } else {
-        btn.textContent = '⏸ Auto Vidéo OFF';
+        btn.textContent = '⏸ Rappel Vidéo OFF';
         btn.style.background = 'rgba(16,185,129,0.08)';
         btn.style.borderColor = 'rgba(16,185,129,0.3)';
         btn.style.color = 'var(--text-muted)';
@@ -2920,7 +2920,7 @@
       if (!API_URL) { showToast('API non configuree', 'error'); return; }
       autoPromoEnabled = !autoPromoEnabled;
       updateAutoPromoBtn();
-      showToast(autoPromoEnabled ? '🎬 Auto Vidéo activé (19h Paris)' : '⏸ Auto Vidéo désactivé', autoPromoEnabled ? 'success' : 'warning', 2500);
+      showToast(autoPromoEnabled ? '🎬 Rappel Vidéo activé' : '⏸ Rappel Vidéo désactivé', autoPromoEnabled ? 'success' : 'warning', 2500);
 
       try {
         await fetch(API_URL, {
