@@ -625,10 +625,10 @@ function seedTestData(ss) {
   if (cfgData.length <= 1) { // uniquement headers ou vide
     var cfgRows = [
       // platform, group, url, type, active, frequency, lastPosted, notes
-      ['Facebook', 'NO CODE APP Builder',       'https://www.facebook.com/groups',       'MANUEL', true,  'weekly',   '', '125K membres'],
+      ['Facebook', 'Bubble.io (Certified Bubble Developers) & No-Code Developers',       'https://www.facebook.com/groups',       'MANUEL', true,  'weekly',   '', '125K membres'],
       ['Facebook', 'n8n Builders',              'https://www.facebook.com/groups',            'MANUEL', true,  'weekly',   '', '147K membres'],
-      ['Facebook', 'n8n Hub',                   'https://www.facebook.com/groups',                 'MANUEL', true,  'weekly',   '', '37K membres'],
-      ['Facebook', 'AI for Everyone',           'https://www.facebook.com/groups',          'MANUEL', true,  'weekly',   '', '21K membres'],
+      ['Facebook', 'n8n Hub - Workflows, Templates, AI Automations',                   'https://www.facebook.com/groups',                 'MANUEL', true,  'weekly',   '', '37K membres'],
+      ['Facebook', 'AI for Everyone: No-Code AI & Learning Hub',           'https://www.facebook.com/groups',          'MANUEL', true,  'weekly',   '', '21K membres'],
       ['Facebook', 'Low code & no code',        'https://www.facebook.com/groups',          'MANUEL', true,  'weekly',   '', '3.5K membres'],
       ['Reddit',   'r/nocode',                  'https://www.reddit.com',                        'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
       ['Reddit',   'r/n8n',                     'https://www.reddit.com',                           'MANUEL', false, 'weekly',   '', 'Phase 3 — attente karma'],
@@ -723,9 +723,9 @@ function seedTestData(ss) {
   if (planData.length <= 1) {
     var planRows = [
       // date, platform, group, article, status, doneAt
-      [today, 'Facebook', 'NO CODE APP Builder', 'zapier-alternatives',        'pending', ''],
+      [today, 'Facebook', 'Bubble.io (Certified Bubble Developers) & No-Code Developers', 'zapier-alternatives',        'pending', ''],
       [today, 'Facebook', 'n8n Builders',         'best-free-automation-tools', 'pending', ''],
-      [today, 'Facebook', 'n8n Hub',              'n8n-vs-zapier',              'pending', ''],
+      [today, 'Facebook', 'n8n Hub - Workflows, Templates, AI Automations',              'n8n-vs-zapier',              'pending', ''],
     ];
     planSheet.getRange(2, 1, planRows.length, planRows[0].length).setValues(planRows);
   }
@@ -938,10 +938,10 @@ function resetMarketing() {
   var lastCfg = cfgSheet.getLastRow();
   if (lastCfg > 1) cfgSheet.deleteRows(2, lastCfg - 1);
   var cfgRows = [
-    ['Facebook', 'NO CODE APP Builder',  'https://www.facebook.com/groups',  'MANUEL', true,  'weekly',   '', '125K - Lundi'],
+    ['Facebook', 'Bubble.io (Certified Bubble Developers) & No-Code Developers',  'https://www.facebook.com/groups',  'MANUEL', true,  'weekly',   '', '125K - Lundi'],
     ['Facebook', 'n8n Builders',         'https://www.facebook.com/groups',       'MANUEL', true,  'weekly',   '', '147K - Mardi'],
-    ['Facebook', 'n8n Hub',              'https://www.facebook.com/groups',            'MANUEL', true,  'weekly',   '', '37K - Mercredi'],
-    ['Facebook', 'AI for Everyone',      'https://www.facebook.com/groups',     'MANUEL', true,  'weekly',   '', '21K - Jeudi'],
+    ['Facebook', 'n8n Hub - Workflows, Templates, AI Automations',              'https://www.facebook.com/groups',            'MANUEL', true,  'weekly',   '', '37K - Mercredi'],
+    ['Facebook', 'AI for Everyone: No-Code AI & Learning Hub',      'https://www.facebook.com/groups',     'MANUEL', true,  'weekly',   '', '21K - Jeudi'],
     ['Facebook', 'Low code & no code',   'https://www.facebook.com/groups',     'MANUEL', true,  'weekly',   '', '3.5K - Vendredi'],
     ['Reddit',   'r/nocode',             'https://www.reddit.com',                   'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
     ['Reddit',   'r/n8n',                'https://www.reddit.com',                      'MANUEL', false, 'weekly',   '', 'Phase 3 - attente karma'],
