@@ -2492,7 +2492,7 @@
             isoStr: toLocalISO(cursor),
             isToday: cursor.getTime() === todayDate.getTime(),
             isPast: cursor < todayDate,
-            dowIndex: days.length,
+            dowIndex: cursor.getDay() - 1, // 0=lun 1=mar 2=mer 3=jeu 4=ven (synchro avec backend)
           });
         }
         cursor.setDate(cursor.getDate() + 1);
