@@ -253,12 +253,6 @@ function getToday() {
         };
       });
 
-      // Fallback: si aucun template Textes ne matche, generer un texte par defaut
-      if (resolvedTextes.length === 0 && (article.title || article.url)) {
-        var defaultText = (article.title || '') + '\n\n' + (article.url || '') + '\n\n#nocode #automation #ai #tools #tech';
-        resolvedTextes = [{ variant: 'default', template: '{title}\n\n{url}\n\n#nocode #automation #ai #tools #tech', resolved: defaultText }];
-      }
-
       return {
         row       : row._row,
         date      : row.date,
@@ -1594,10 +1588,9 @@ function getWeekPlanning(weekStartStr) {
   var result = filtered.map(function(row) {
     var article = articlesIndex[row.article] || {};
 
-    // Textes correspondants (supporte wildcard article='*', case-insensitive platform)
-    var rowPlatformLower = (row.platform || '').toLowerCase();
+    // Textes correspondants (supporte wildcard article='*')
     var matchingTextes = textes.filter(function(t) {
-      return (t.platform || '').toLowerCase() === rowPlatformLower && (t.article === row.article || t.article === '*');
+      return t.platform === row.platform && (t.article === row.article || t.article === '*');
     });
     var resolvedTextes = matchingTextes.map(function(t) {
       return {
@@ -1607,19 +1600,12 @@ function getWeekPlanning(weekStartStr) {
       };
     });
 
-    // Fallback: si aucun template Textes ne matche, generer un texte par defaut
-    if (resolvedTextes.length === 0 && (article.title || article.url)) {
-      var defaultText = (article.title || '') + '\n\n' + (article.url || '') + '\n\n#nocode #automation #ai #tools #tech';
-      resolvedTextes = [{ variant: 'default', template: '{title}\n\n{url}\n\n#nocode #automation #ai #tools #tech', resolved: defaultText }];
-    }
-
     return {
       date: row.date,
       platform: row.platform || '',
       group: row.group || '',
       article: row.article || '',
       articleTitle: article.title || row.article,
-      articleUrl: article.url || '',
       status: row.status || '',
       doneAt: row.doneAt || '',
       textes: resolvedTextes,
