@@ -253,6 +253,12 @@ function getToday() {
         };
       });
 
+      // Fallback: si aucun template Textes ne matche, generer un texte par defaut
+      if (resolvedTextes.length === 0 && (article.title || article.url)) {
+        var defaultText = (article.title || '') + '\n\n' + (article.url || '') + '\n\n#nocode #automation #ai #tools #tech';
+        resolvedTextes = [{ variant: 'default', template: '{title}\n\n{url}\n\n#nocode #automation #ai #tools #tech', resolved: defaultText }];
+      }
+
       return {
         row       : row._row,
         date      : row.date,
@@ -1600,6 +1606,12 @@ function getWeekPlanning(weekStartStr) {
         resolved : resolveTemplate(t.template, article)
       };
     });
+
+    // Fallback: si aucun template Textes ne matche, generer un texte par defaut
+    if (resolvedTextes.length === 0 && (article.title || article.url)) {
+      var defaultText = (article.title || '') + '\n\n' + (article.url || '') + '\n\n#nocode #automation #ai #tools #tech';
+      resolvedTextes = [{ variant: 'default', template: '{title}\n\n{url}\n\n#nocode #automation #ai #tools #tech', resolved: defaultText }];
+    }
 
     return {
       date: row.date,
