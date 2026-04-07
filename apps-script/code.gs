@@ -1588,9 +1588,10 @@ function getWeekPlanning(weekStartStr) {
   var result = filtered.map(function(row) {
     var article = articlesIndex[row.article] || {};
 
-    // Textes correspondants (supporte wildcard article='*')
+    // Textes correspondants (supporte wildcard article='*', case-insensitive platform)
+    var rowPlatformLower = (row.platform || '').toLowerCase();
     var matchingTextes = textes.filter(function(t) {
-      return t.platform === row.platform && (t.article === row.article || t.article === '*');
+      return (t.platform || '').toLowerCase() === rowPlatformLower && (t.article === row.article || t.article === '*');
     });
     var resolvedTextes = matchingTextes.map(function(t) {
       return {
@@ -1606,6 +1607,7 @@ function getWeekPlanning(weekStartStr) {
       group: row.group || '',
       article: row.article || '',
       articleTitle: article.title || row.article,
+      articleUrl: article.url || '',
       status: row.status || '',
       doneAt: row.doneAt || '',
       textes: resolvedTextes,
