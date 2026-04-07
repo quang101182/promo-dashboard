@@ -2471,6 +2471,10 @@
           // Re-fetch planning after generation
           const replanRes = await fetch(`${API_URL}?action=weekPlanning&date=${mondayISO}`, { redirect: 'follow' }).then(r => r.json()).catch(() => ({ planning: [] }));
           weekPlanningCache = Array.isArray(replanRes.planning) ? replanRes.planning : [];
+          console.log('[DEBUG] weekPlanningCache after re-fetch:', weekPlanningCache.length, 'entries');
+          if (weekPlanningCache.length > 0) {
+            console.log('[DEBUG] Sample:', weekPlanningCache.slice(0, 5).map(p => p.date + ' | ' + p.platform + ' | ' + p.group + ' | textes:' + (p.textes||[]).length));
+          }
         }
 
         renderWeekView();
@@ -2774,6 +2778,11 @@
             const platformKey = (t.platform).toLowerCase();
             const icon = PLATFORM_ICONS[platformKey] || '🔗';
             const matchedPlan = dayPlanning.find(p => (p.platform || '').toLowerCase() === platformKey && (p.group || '').toLowerCase() === (t.group || '').toLowerCase());
+            // DEBUG matching
+            if (!matchedPlan) {
+              console.warn('[MATCH]', day.isoStr, 'NO MATCH for:', platformKey, JSON.stringify(t.group));
+              console.warn('[MATCH] dayPlanning(' + dayPlanning.length + '):', dayPlanning.map(p => p.platform + ' | ' + p.group));
+            }
             const isDone = matchedPlan && matchedPlan.status === 'done';
             const isSkipped = matchedPlan && matchedPlan.status === 'skipped';
             const articleTitle = matchedPlan ? (matchedPlan.articleTitle || matchedPlan.article || '') : '';
