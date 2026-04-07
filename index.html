@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Promo Dashboard v2.5.0 — Single-file HTML autonome -->
+<!-- Promo Dashboard v2.5.3 — Single-file HTML autonome -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promo Dashboard v2.5.0</title>
+  <title>Promo Dashboard v2.5.3</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1316,7 +1316,7 @@
         </div>
       </div>
 
-      <div class="footer">v2.5.0 — Promo Dashboard</div>
+      <div class="footer">v2.5.3 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -1428,7 +1428,7 @@
 
       <button onclick="runDebug()" style="display:block;margin:20px auto 0;background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 20px;cursor:pointer;font-size:0.8rem;font-family:Inter,sans-serif;">🔍 Debug Log</button>
 
-      <div class="footer">v2.5.0 — Promo Dashboard</div>
+      <div class="footer">v2.5.3 — Promo Dashboard</div>
     </div>
   </div>
 
@@ -2435,6 +2435,34 @@
         weekConfigCache = (configRes.config || []).filter(g => g.active);
         weekVideosCache = videosRes.videos || [];
         weekPlanningCache = Array.isArray(planningRes.planning) ? planningRes.planning : [];
+
+        // Auto-generate missing planning days (current week only)
+        const days = getWeekDays(weekOffset);
+        const missingDays = [];
+        days.forEach(day => {
+          const hasPlanning = weekPlanningCache.some(p => normalizeDateStr(p.date) === day.isoStr);
+          if (hasPlanning) return;
+          const hasConfigTasks = weekConfigCache.some((g, idx) => {
+            const freq = (g.frequency || 'weekly').toLowerCase();
+            return shouldPostOnDay(freq, idx, day.dowIndex);
+          });
+          if (hasConfigTasks) missingDays.push(day.isoStr);
+        });
+
+        if (missingDays.length > 0) {
+          console.log('[AutoGen] Generating planning for missing days:', missingDays);
+          await Promise.all(missingDays.map(dateStr =>
+            fetch(API_URL, {
+              method: 'POST',
+              redirect: 'follow',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'generate', date: dateStr })
+            }).then(r => r.json()).catch(e => { console.warn('[AutoGen] Failed for', dateStr, e); return {}; })
+          ));
+          // Re-fetch planning after generation
+          const replanRes = await fetch(`${API_URL}?action=weekPlanning&date=${mondayISO}`, { redirect: 'follow' }).then(r => r.json()).catch(() => ({ planning: [] }));
+          weekPlanningCache = Array.isArray(replanRes.planning) ? replanRes.planning : [];
+        }
 
         renderWeekView();
       } catch (err) {
